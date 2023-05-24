@@ -1,98 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-//import 'package:http/http.dart' as http;
-import 'package:music_player/screens/home_screen.dart';
-import 'dart:convert';
+import 'package:music_player/modals/audio_file.dart';
+import 'package:music_player/modals/search_output.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:music_player/screens/search_screen.dart';
 
-late String stringResponse;
-late String author;
-
 class PlayerScreen extends StatefulWidget {
-  const PlayerScreen({super.key});
+  final Songs song;
+  const PlayerScreen({super.key, required this.song});
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
 }
 
-void parseResponse(String responseBody) {
-  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-
-  // Iterate over the parsed response
-  List<Song> songs = parsed.map<Song>((json) => Song.fromJson(json)).toList();
-
-  // Now you can use the 'songs' list as needed
-  // For example, you can access individual song properties like:
-  print(songs[0].author);
-  print(songs[0].title);
-  author = songs[0].author;
-  // ...
-}
-
-class Song {
-  final String author;
-  final int id;
-  final List<StreamLink> streamLinks;
-  final String thumbnail;
-  final String title;
-  final String viewcount;
-
-  Song({
-    required this.author,
-    required this.id,
-    required this.streamLinks,
-    required this.thumbnail,
-    required this.title,
-    required this.viewcount,
-  });
-
-  factory Song.fromJson(Map<String, dynamic> json) {
-    return Song(
-      author: json['author'],
-      id: json['id'],
-      streamLinks: List<StreamLink>.from(
-          json['streamlinks'].map((x) => StreamLink.fromJson(x))),
-      thumbnail: json['thumbnail'],
-      title: json['title'],
-      viewcount: json['viewcount'],
-    );
-  }
-}
-
-class StreamLink {
-  final String mimeType;
-  final String url;
-
-  StreamLink({
-    required this.mimeType,
-    required this.url,
-  });
-
-  factory StreamLink.fromJson(Map<String, dynamic> json) {
-    return StreamLink(
-      mimeType: json['mimeType'],
-      url: json['url'],
-    );
-  }
-}
-
 class _PlayerScreenState extends State<PlayerScreen> {
-  // Future apicall() async {
-  // http.Response response;
-  // response = await http
-  //     .get(Uri.parse('https://ytmusic-tau.vercel.app?search=faded'));
-  // setState(() {
-  //   stringResponse = response.body;
-  //   parseResponse(stringResponse);
-  //final parsed = json.decode(stringResponse).cast<Map<String, dynamic>>();
-  // });
-//  }
-
-//  }
-  double _currentslidervalue = 50.0;
+  late AudioPlayer advancedPlayer;
+  double _currentslidervalue = 10.0;
   bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    advancedPlayer = AudioPlayer();
+  }
 
   Widget slider() {
     return Slider(
@@ -112,7 +42,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SafeArea(
+        child: Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -133,7 +64,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Icons.arrow_back_ios,
               size: 25,
             ),
-            onPressed: () => {Get.to(() => const HomeScreen())},
+            onPressed: () => {Navigator.of(context).pop()},
           ),
           centerTitle: true,
           title: Text(
@@ -147,7 +78,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 Icons.search,
                 size: 25,
               ),
-              onPressed: () => {Get.to(() => const SearchScreen())},
+              onPressed: () => {Navigator.of(context).pop()},
             ),
           ],
         ),
@@ -158,15 +89,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 padding: const EdgeInsets.only(top: 50.0),
                 child: Center(
                   child: ClipRRect(
-                    //height: 300,
-                    //borderRadius: BorderRadius.circular(300.0),
-                    child: Lottie.network(
-                      'https://assets1.lottiefiles.com/private_files/lf30_xnjjfyjt.json',
+                    borderRadius: BorderRadius.circular(25.0),
+                    child: Image.network(
+                      //'https://assets1.lottiefiles.com/private_files/lf30_xnjjfyjt.json',
                       //'https://assets1.lottiefiles.com/private_files/lf30_qqbtrtae.json',
                       //'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
-                      width: 300.0,
+                      widget.song.thumbnail,
+                      width: 320.0,
                       height: 300.0,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ),
@@ -175,7 +106,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 children: [
                   SizedBox(
                     child: Text(
-                      'Track Title',
+                      widget.song.title,
                       style: GoogleFonts.poppins(
                         fontSize: 25.0,
                         fontWeight: FontWeight.bold,
@@ -186,7 +117,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                   SizedBox(
                     child: Text(
-                      'Track author',
+                      widget.song.author,
                       style: GoogleFonts.poppins(
                         fontSize: 20.0,
                         color: Colors.white60,
@@ -203,6 +134,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          AudioFile(advancedPlayer:advancedPlayer),
                           Text('0:00',
                               style: GoogleFonts.poppins(
                                   fontSize: 16.0, fontWeight: FontWeight.bold)),
@@ -264,6 +196,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
               )
             ]),
       ),
-    );
+    ));
   }
 }

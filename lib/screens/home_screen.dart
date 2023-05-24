@@ -80,11 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ));
                 break;
               case 1:
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return const SearchScreen();
-                  },
-                ));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: "/Search"),
+                      builder: (context) {
+                        return const SearchScreen();
+                      },
+                    ));
                 break;
             }
           },

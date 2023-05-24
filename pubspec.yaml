@@ -28,15 +28,15 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  audioplayers: ^4.0.1
   convert: ^3.1.1
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
+  flutter_typeahead: ^4.4.0
   get: ^4.6.5
   google_fonts: ^4.0.4
   http: ^0.13.6
-  just_audio: ^0.9.33
-  lottie: ^2.3.2
   rxdart: ^0.27.7
 
 dev_dependencies:
