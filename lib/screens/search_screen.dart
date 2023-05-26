@@ -99,6 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     );
                   },
                   getImmediateSuggestions: true,
+                  hideOnLoading: true,
                   onSuggestionSelected: (suggestion) {
                     Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) {

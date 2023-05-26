@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:music_player/modals/audio_file.dart';
 import 'package:music_player/modals/search_output.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:music_player/screens/search_screen.dart';
 
 class PlayerScreen extends StatefulWidget {
   final Songs song;
@@ -14,14 +12,37 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  late AudioPlayer advancedPlayer;
+  AudioPlayer advancedPlayer = AudioPlayer();
   double _currentslidervalue = 10.0;
   bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    advancedPlayer = AudioPlayer();
+    playMusic();
+    advancedPlayer.setPlayerMode(PlayerMode.mediaPlayer);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    advancedPlayer.release();
+    advancedPlayer.dispose();
+  }
+
+  playMusic() async {
+    await advancedPlayer.play(UrlSource(widget.song.streamlinks[0].url));
+    setState(() {
+      _isPlaying = true;
+    });
+  }
+
+  pauseMusic() async {
+    await advancedPlayer.pause();
+  }
+
+  resumeMusic() async {
+    await advancedPlayer.resume();
   }
 
   Widget slider() {
@@ -91,9 +112,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
                     child: Image.network(
-                      //'https://assets1.lottiefiles.com/private_files/lf30_xnjjfyjt.json',
-                      //'https://assets1.lottiefiles.com/private_files/lf30_qqbtrtae.json',
-                      //'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg',
                       widget.song.thumbnail,
                       width: 320.0,
                       height: 300.0,
@@ -134,7 +152,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          AudioFile(advancedPlayer:advancedPlayer),
                           Text('0:00',
                               style: GoogleFonts.poppins(
                                   fontSize: 16.0, fontWeight: FontWeight.bold)),
@@ -163,14 +180,26 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           size: 80.0,
                         ),
                         onTap: () {
-                          setState(() {
-                            _isPlaying = !_isPlaying;
-                          });
+                          if (_isPlaying) {
+                            setState(() {
+                              pauseMusic();
+                              _isPlaying = false;
+                            });
+                          } else {
+                            setState(() {
+                              playMusic();
+                              _isPlaying = true;
+                            });
+                          }
                         },
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
-                        onTap: () {},
+                        onTap: () async {
+                          advancedPlayer.onPositionChanged.listen((event) {
+                            print(event);
+                          });
+                        },
                         child: const Icon(
                           Icons.skip_next_rounded,
                           color: Colors.white,
