@@ -1,7 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio_cache/just_audio_cache.dart';
 import 'package:music_player/modals/search_output.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:music_player/screens/search_screen.dart';
+import 'package:http/http.dart' as http;
 
 class PlayerScreen extends StatefulWidget {
   final Songs song;
@@ -12,50 +17,127 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
+  double _maxSliderValue = 0.0;
   AudioPlayer advancedPlayer = AudioPlayer();
-  double _currentslidervalue = 10.0;
-  bool _isPlaying = false;
+  double _currentslidervalue = 0.0;
+  bool _isLoop = false;
+  bool _isMute = false;
+  dynamic duration = 0.0;
+  String title = "";
+  String author = "";
+  String thumbnail = "";
+  String streamlink = "";
 
   @override
   void initState() {
     super.initState();
+    _initializeSongDetails(widget.song);
     playMusic();
-    advancedPlayer.setPlayerMode(PlayerMode.mediaPlayer);
+    advancedPlayer.positionStream.listen((event) {
+      setState(() {
+        _currentslidervalue = event.inMilliseconds.toDouble();
+      });
+    });
+    advancedPlayer.durationStream.listen((event) {
+      _maxSliderValue = event?.inMilliseconds.toDouble() ?? 100.0;
+    });
+    advancedPlayer.setVolume(1.0);
+    advancedPlayer.playerStateStream.listen((playerState) {
+      if (playerState.processingState == ProcessingState.completed) {
+        _playNextSong();
+      }
+    });
+  }
+
+  void _initializeSongDetails(Songs song) {
+    title = song.title;
+    author = song.author;
+    thumbnail = song.thumbnail;
+    streamlink = song.streamlinks[0].url;
+    advancedPlayer.dispose();
+    advancedPlayer = AudioPlayer();
   }
 
   @override
   void dispose() {
     super.dispose();
-    advancedPlayer.release();
     advancedPlayer.dispose();
   }
 
-  playMusic() async {
-    await advancedPlayer.play(UrlSource(widget.song.streamlinks[0].url));
+  Future<void> _playNextSong() async {
+    advancedPlayer.clearCache();
+    final response = await http.get(Uri.parse(
+        "https://ytmusic-tau.vercel.app/next/${widget.song.videoid}"));
+    var data = jsonDecode(response.body.toString());
     setState(() {
-      _isPlaying = true;
+      author = data[0]["author"];
+      title = data[0]["title"];
+      thumbnail = data[0]["thumbnail"];
+      advancedPlayer.setUrl(data[0]["streamlinks"][0]["url"]);
     });
   }
 
-  pauseMusic() async {
-    await advancedPlayer.pause();
+  Future<void> playMusic() async {
+    duration = await advancedPlayer.setUrl(streamlink);
+    advancedPlayer.play();
   }
 
-  resumeMusic() async {
-    await advancedPlayer.resume();
+  Future<void> _togglePlayback() async {
+    if (advancedPlayer.playing) {
+      await advancedPlayer.pause();
+    } else {
+      await advancedPlayer.play();
+    }
+  }
+
+  Future<void> _setloop() async {
+    if (_isLoop == false) {
+      await advancedPlayer.setLoopMode(LoopMode.one);
+      setState(() {
+        _isLoop = true;
+      });
+    } else {
+      await advancedPlayer.setLoopMode(LoopMode.off);
+      setState(() {
+        _isLoop = false;
+      });
+    }
+  }
+
+  Future<void> _setMute() async {
+    if (_isMute == false) {
+      await advancedPlayer.setVolume(0.0);
+      setState(() {
+        _isMute = true;
+      });
+    } else {
+      await advancedPlayer.setVolume(1.0);
+      setState(() {
+        _isMute = false;
+      });
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    String minutes =
+        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds =
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   Widget slider() {
-    return Slider(
+    return Slider.adaptive(
       thumbColor: Colors.white,
       activeColor: Colors.white,
+      autofocus: false,
       inactiveColor: const Color.fromARGB(201, 148, 148, 148),
       min: 0.0,
-      max: 100.0,
-      value: _currentslidervalue,
+      max: advancedPlayer.duration?.inMilliseconds.toDouble() ?? 100.0,
+      value: _currentslidervalue.clamp(0, _maxSliderValue),
       onChanged: (double value) {
         setState(() {
-          _currentslidervalue = value;
+          advancedPlayer.seek(Duration(milliseconds: value.toInt()));
         });
       },
     );
@@ -63,6 +145,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Duration totalDuration = advancedPlayer.duration ?? Duration.zero;
+    Duration currentPosition =
+        Duration(milliseconds: _currentslidervalue.toInt());
+
     return SafeArea(
         child: Container(
       decoration: BoxDecoration(
@@ -85,7 +171,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Icons.arrow_back_ios,
               size: 25,
             ),
-            onPressed: () => {Navigator.of(context).pop()},
+            onPressed: () {
+              Navigator.of(context).pop();
+              advancedPlayer.dispose();
+            },
           ),
           centerTitle: true,
           title: Text(
@@ -95,11 +184,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.search,
-                size: 25,
-              ),
-              onPressed: () => {Navigator.of(context).pop()},
+              icon: const FaIcon(FontAwesomeIcons.ellipsisVertical),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) {
+                    return const SearchScreen();
+                  },
+                ));
+              },
             ),
           ],
         ),
@@ -107,12 +199,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 50.0),
+                padding: const EdgeInsets.only(top: 30.0),
                 child: Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
                     child: Image.network(
-                      widget.song.thumbnail,
+                      thumbnail,
                       width: 320.0,
                       height: 300.0,
                       fit: BoxFit.fill,
@@ -124,7 +216,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 children: [
                   SizedBox(
                     child: Text(
-                      widget.song.title,
+                      title,
                       style: GoogleFonts.poppins(
                         fontSize: 25.0,
                         fontWeight: FontWeight.bold,
@@ -135,7 +227,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                   SizedBox(
                     child: Text(
-                      widget.song.author,
+                      author,
                       style: GoogleFonts.poppins(
                         fontSize: 20.0,
                         color: Colors.white60,
@@ -152,10 +244,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('0:00',
+                          Text(_formatDuration(currentPosition),
                               style: GoogleFonts.poppins(
                                   fontSize: 16.0, fontWeight: FontWeight.bold)),
-                          Text('1:00',
+                          Text(_formatDuration(totalDuration),
                               style: GoogleFonts.poppins(
                                   fontSize: 16.0, fontWeight: FontWeight.bold)),
                         ])),
@@ -165,40 +257,45 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     children: [
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
+                        child: Icon(
+                          _isMute ? Icons.volume_off : Icons.volume_up,
+                          color: Colors.white,
+                          size: 35.0,
+                        ),
+                        onTap: () {
+                          _setMute();
+                        },
+                      ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20.0),
                         child: const Icon(
                           Icons.skip_previous_rounded,
                           color: Colors.white,
                           size: 50.0,
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          setState(() {
+                            advancedPlayer.seek(Duration.zero);
+                          });
+                        },
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
                         child: Icon(
-                          _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                          advancedPlayer.playing
+                              ? Icons.pause_circle
+                              : Icons.play_circle,
                           color: Colors.white,
                           size: 80.0,
                         ),
                         onTap: () {
-                          if (_isPlaying) {
-                            setState(() {
-                              pauseMusic();
-                              _isPlaying = false;
-                            });
-                          } else {
-                            setState(() {
-                              playMusic();
-                              _isPlaying = true;
-                            });
-                          }
+                          _togglePlayback();
                         },
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20.0),
                         onTap: () async {
-                          advancedPlayer.onPositionChanged.listen((event) {
-                            print(event);
-                          });
+                          _playNextSong();
                         },
                         child: const Icon(
                           Icons.skip_next_rounded,
@@ -206,6 +303,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           size: 50.0,
                         ),
                       ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20.0),
+                        onTap: () {
+                          _setloop();
+                        },
+                        child: Icon(
+                          _isLoop ? Icons.repeat_one : Icons.repeat,
+                          color: Colors.white,
+                          size: 35.0,
+                        ),
+                      )
                     ])
               ]),
               Container(

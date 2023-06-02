@@ -57,7 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       fontSize: 20.0,
                     ),
                     onSubmitted: (value) {
-                      Navigator.push(context, MaterialPageRoute(
+                      Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) {
                           return SearchResultScreen(message: value);
                         },
@@ -147,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<List<dynamic>> getsuggestion(String pattern) async {
     final response = await http.get(Uri.parse(
-        'https://ytmusic-tau.vercel.app/search_suggestion/${pattern}'));
+        'https://ytmusic-tau.vercel.app/search_suggestion/$pattern'));
     var data = jsonDecode(response.body.toString());
     if (response.statusCode == 200) {
       return data['suggestions'];

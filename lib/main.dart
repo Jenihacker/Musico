@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:music_player/screens/search_results.dart';
-import 'screens/player_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/search_screen.dart';
+import 'package:music_player/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    //_navigatehome();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Music App',
+      title: 'Musico',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         textTheme: Theme.of(context).textTheme.apply(
@@ -23,8 +31,7 @@ class MyApp extends StatelessWidget {
               displayColor: Colors.white,
             ),
       ),
-      home: const HomeScreen(),
-      
+      home: const SplashScreen(),
     );
   }
 }

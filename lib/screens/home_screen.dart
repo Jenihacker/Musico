@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:music_player/screens/search_screen.dart';
 
@@ -61,11 +60,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       backgroundColor: const Color(0XFF242424),
-      body: Container(
-        decoration: const BoxDecoration(
-            boxShadow: [BoxShadow(color: Color(0XFF1F1545))]),
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(
+              boxShadow: [BoxShadow(color: Color(0XFF1F1545))]),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           backgroundColor: const Color(0XFF1F1545),
           elevation: 0,
           selectedItemColor: Colors.white,
@@ -73,21 +75,18 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: (value) {
             switch (value) {
               case 0:
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
-                    ));
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) {
+                    return const HomeScreen();
+                  },
+                ));
                 break;
               case 1:
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      settings: const RouteSettings(name: "/Search"),
-                      builder: (context) {
-                        return const SearchScreen();
-                      },
-                    ));
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) {
+                    return const SearchScreen();
+                  },
+                ));
                 break;
             }
           },

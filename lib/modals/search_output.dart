@@ -10,6 +10,7 @@ class Songs {
     List<Streamlink> streamlinks;
     String thumbnail;
     String title;
+    String videoid;
     String viewcount;
 
     Songs({
@@ -18,6 +19,7 @@ class Songs {
         required this.streamlinks,
         required this.thumbnail,
         required this.title,
+        required this.videoid,
         required this.viewcount,
     });
 
@@ -27,6 +29,7 @@ class Songs {
         streamlinks: List<Streamlink>.from(json["streamlinks"].map((x) => Streamlink.fromJson(x))),
         thumbnail: json["thumbnail"],
         title: json["title"],
+        videoid: json["videoid"],
         viewcount: json["viewcount"],
     );
 
@@ -36,6 +39,7 @@ class Songs {
         "streamlinks": List<dynamic>.from(streamlinks.map((x) => x.toJson())),
         "thumbnail": thumbnail,
         "title": title,
+        "videoid": videoid,
         "viewcount": viewcount,
     };
 }
@@ -60,10 +64,12 @@ class Streamlink {
     };
 }
 
-enum MimeType { AUDIO_MP4 }
+// ignore: constant_identifier_names
+enum MimeType { AUDIO_MP4, AUDIO_WEBM }
 
 final mimeTypeValues = EnumValues({
-    "audio/mp4": MimeType.AUDIO_MP4
+    "audio/mp4": MimeType.AUDIO_MP4,
+    "audio/webm": MimeType.AUDIO_WEBM
 });
 
 class EnumValues<T> {

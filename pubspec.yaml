@@ -31,14 +31,19 @@ dependencies:
   audioplayers: ^4.0.1
   convert: ^3.1.1
   cupertino_icons: ^1.0.2
-  dio: ^5.1.2
   flutter:
     sdk: flutter
+  flutter_cache_manager: ^3.3.0
   flutter_typeahead: ^4.4.0
+  font_awesome_flutter: ^10.4.0
   get: ^4.6.5
   google_fonts: ^4.0.4
   http: ^0.13.6
+  just_audio: ^0.9.33
+  just_audio_cache: ^0.1.1
+  lottie: ^2.3.2
   rxdart: ^0.27.7
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -54,8 +59,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/splash_screen.png
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
