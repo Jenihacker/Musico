@@ -1,11 +1,10 @@
 import 'dart:convert';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio_cache/just_audio_cache.dart';
 import 'package:music_player/modals/search_output.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player/screens/search_screen.dart';
 import 'package:http/http.dart' as http;
 
 class PlayerScreen extends StatefulWidget {
@@ -17,12 +16,10 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  double _maxSliderValue = 0.0;
   AudioPlayer advancedPlayer = AudioPlayer();
-  double _currentslidervalue = 0.0;
+  Duration _currentslidervalue = Duration.zero;
   bool _isLoop = false;
   bool _isMute = false;
-  dynamic duration = 0.0;
   String title = "";
   String author = "";
   String thumbnail = "";
@@ -35,11 +32,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     playMusic();
     advancedPlayer.positionStream.listen((event) {
       setState(() {
-        _currentslidervalue = event.inMilliseconds.toDouble();
+        _currentslidervalue = event;
       });
-    });
-    advancedPlayer.durationStream.listen((event) {
-      _maxSliderValue = event?.inMilliseconds.toDouble() ?? 100.0;
     });
     advancedPlayer.setVolume(1.0);
     advancedPlayer.playerStateStream.listen((playerState) {
@@ -54,7 +48,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     author = song.author;
     thumbnail = song.thumbnail;
     streamlink = song.streamlinks[0].url;
-    advancedPlayer.dispose();
     advancedPlayer = AudioPlayer();
   }
 
@@ -62,10 +55,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
   void dispose() {
     super.dispose();
     advancedPlayer.dispose();
+    Navigator.pop(context);
   }
 
   Future<void> _playNextSong() async {
-    advancedPlayer.clearCache();
     final response = await http.get(Uri.parse(
         "https://ytmusic-tau.vercel.app/next/${widget.song.videoid}"));
     var data = jsonDecode(response.body.toString());
@@ -78,7 +71,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   Future<void> playMusic() async {
-    duration = await advancedPlayer.setUrl(streamlink);
+    AudioSource audioSource = LockCachingAudioSource(Uri.parse(streamlink));
+    await advancedPlayer.setAudioSource(audioSource);
     advancedPlayer.play();
   }
 
@@ -118,37 +112,30 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
-  String _formatDuration(Duration duration) {
-    String minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    String seconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
-
   Widget slider() {
-    return Slider.adaptive(
+    return ProgressBar(
+      progress: _currentslidervalue,
+      buffered: advancedPlayer.bufferedPosition,
+      total: advancedPlayer.duration ?? Duration.zero,
+      progressBarColor: const Color.fromARGB(255, 255, 203, 220),
+      baseBarColor: Colors.white.withOpacity(0.24),
+      bufferedBarColor: Colors.white.withOpacity(0.3),
       thumbColor: Colors.white,
-      activeColor: Colors.white,
-      autofocus: false,
-      inactiveColor: const Color.fromARGB(201, 148, 148, 148),
-      min: 0.0,
-      max: advancedPlayer.duration?.inMilliseconds.toDouble() ?? 100.0,
-      value: _currentslidervalue.clamp(0, _maxSliderValue),
-      onChanged: (double value) {
-        setState(() {
-          advancedPlayer.seek(Duration(milliseconds: value.toInt()));
-        });
+      thumbGlowColor: Colors.white24,
+      barHeight: 7.0,
+      thumbRadius: 10.0,
+      timeLabelLocation: TimeLabelLocation.above,
+      timeLabelPadding: 5.0,
+      timeLabelTextStyle:
+          GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.bold),
+      onSeek: (duration) {
+        advancedPlayer.seek(duration);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    Duration totalDuration = advancedPlayer.duration ?? Duration.zero;
-    Duration currentPosition =
-        Duration(milliseconds: _currentslidervalue.toInt());
-
     return SafeArea(
         child: Container(
       decoration: BoxDecoration(
@@ -185,13 +172,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           actions: [
             IconButton(
               icon: const FaIcon(FontAwesomeIcons.ellipsisVertical),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return const SearchScreen();
-                  },
-                ));
-              },
+              onPressed: () {},
             ),
           ],
         ),
@@ -212,46 +193,41 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                 ),
               ),
-              Column(
-                children: [
-                  SizedBox(
-                    child: Text(
-                      title,
-                      style: GoogleFonts.poppins(
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.poppins(
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  SizedBox(
-                    child: Text(
-                      author,
-                      style: GoogleFonts.poppins(
-                        fontSize: 20.0,
-                        color: Colors.white60,
+                    SizedBox(
+                      child: Text(
+                        author,
+                        style: GoogleFonts.poppins(
+                          fontSize: 20.0,
+                          color: Colors.white60,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(_formatDuration(currentPosition),
-                              style: GoogleFonts.poppins(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
-                          Text(_formatDuration(totalDuration),
-                              style: GoogleFonts.poppins(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold)),
-                        ])),
-                slider(),
+                  padding: const EdgeInsets.only(
+                      left: 10.0, right: 10.0, bottom: 15.0),
+                  child: slider(),
+                ),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [

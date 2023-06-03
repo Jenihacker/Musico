@@ -94,7 +94,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                       style: GoogleFonts.poppins(color: Colors.white70),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    tileColor: const Color(0XFF1F1545),
+                    tileColor: Colors.black38,
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) {
@@ -150,6 +150,7 @@ class ListTileShimmer extends StatelessWidget {
             color: Colors.grey,
           ),
         ),
+        tileColor: Colors.black38,
         title: Container(
           height: 14,
           decoration: const BoxDecoration(

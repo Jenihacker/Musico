@@ -75,14 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: (value) {
             switch (value) {
               case 0:
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) {
                     return const HomeScreen();
                   },
                 ));
                 break;
               case 1:
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) {
                     return const SearchScreen();
                   },
