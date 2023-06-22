@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:music_player/screens/home_screen.dart';
-import 'package:music_player/screens/search_results.dart';
+import 'package:music_player/screens/search_results1.dart';
+import 'package:page_transition/page_transition.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -29,7 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
             Icons.arrow_back_ios,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.back();
           },
         ),
       ),
@@ -57,11 +58,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       fontSize: 20.0,
                     ),
                     onSubmitted: (value) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) {
-                          return SearchResultScreen(message: value);
-                        },
-                      ));
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              child: SearchResultScreen1(message: value),
+                              type: PageTransitionType.rightToLeftWithFade));
                     },
                     decoration: InputDecoration(
                       filled: true,
@@ -103,7 +104,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   onSuggestionSelected: (suggestion) {
                     Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) {
-                        return SearchResultScreen(message: suggestion);
+                        return SearchResultScreen1(message: suggestion);
                       },
                     ));
                   },
@@ -147,7 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<List<dynamic>> getsuggestion(String pattern) async {
     final response = await http.get(Uri.parse(
-        'https://ytmusic-tau.vercel.app/search_suggestion/$pattern'));
+        'https://ytmusic-tau.vercel.app/search_suggestion?query=$pattern'));
     var data = jsonDecode(response.body.toString());
     if (response.statusCode == 200) {
       return data['suggestions'];

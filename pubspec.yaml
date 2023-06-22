@@ -29,19 +29,23 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   audio_video_progress_bar: ^1.0.1
+  cached_network_image: ^3.2.3
   convert: ^3.1.1
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
   flutter_cache_manager: ^3.3.0
+  flutter_native_splash: ^2.3.0
   flutter_typeahead: ^4.4.0
   font_awesome_flutter: ^10.4.0
   get: ^4.6.5
   google_fonts: ^4.0.4
   http: ^0.13.6
   just_audio: ^0.9.33
+  just_audio_background: ^0.0.1-beta.10
   lottie: ^2.3.2
-  rxdart: ^0.27.7
+  marquee: ^2.2.3
+  page_transition: ^2.0.9
   shimmer: ^3.0.0
 
 dev_dependencies:
@@ -59,7 +63,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/splash_screen.png
+    - assets/images/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
