@@ -1,17 +1,20 @@
 import 'dart:convert';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:music_player/modals/search_output.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:http/http.dart' as http;
+import 'package:music_player/screens/search_screen.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:shimmer/shimmer.dart';
 
 class PlayerScreen extends StatefulWidget {
-  final Songs song;
-  const PlayerScreen({super.key, required this.song});
+  final String vd;
+  const PlayerScreen({super.key, required this.vd});
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -22,18 +25,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Duration _currentslidervalue = Duration.zero;
   bool _isLoop = false;
   bool _isMute = false;
-  String title = "";
-  String author = "";
-  String thumbnail = "";
-  String streamlink = "";
+  List<String> title = [""];
+  List<String> author = [""];
+  List<String> thumbnail = [""];
+  List<String> streamlink = [""];
   String videoid = "";
   late ConcatenatingAudioSource audio;
 
   @override
   void initState() {
     super.initState();
-    _initializeSongDetails(widget.song);
-    playMusic();
+    _initializeSongDetails(widget.vd);
     advancedPlayer.positionStream.listen((event) {
       setState(() {
         _currentslidervalue = event;
@@ -47,12 +49,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
     });
   }
 
-  void _initializeSongDetails(Songs song) {
-    title = song.title;
-    author = song.author;
-    thumbnail = song.thumbnail;
-    streamlink = song.streamlinks[0].url;
-    videoid = song.videoid;
+  void _initializeSongDetails(String song) async {
+    final response = await http
+        .get(Uri.parse("https://ytmusic-tau.vercel.app/songdetails/$song"));
+    var data = jsonDecode(response.body.toString());
+    title[0] = data[0]["title"];
+    author[0] = data[0]["author"];
+    thumbnail[0] = data[0]["thumbnail"];
+    streamlink[0] = data[0]["streamlinks"][0]["url"];
+    videoid = data[0]["videoid"];
+    playMusic();
   }
 
   @override
@@ -69,10 +75,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
     if (vid == data[0]["videoid"]) {
       _playNextSong(vid);
     }
+    author.add(data[0]["author"]);
+    title.add(data[0]["title"]);
+    thumbnail.add(data[0]["thumbnail"]);
     setState(() {
-      author = data[0]["author"];
-      title = data[0]["title"];
-      thumbnail = data[0]["thumbnail"];
       videoid = data[0]["videoid"];
     });
     AudioSource metadata = AudioSource.uri(
@@ -86,8 +92,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         artUri: Uri.parse(data[0]["thumbnail"]),
       ),
     );
-    audio.add(metadata);
-    await advancedPlayer.seekToNext();
+    await audio.add(metadata);
+    advancedPlayer.seekToNext();
     advancedPlayer.play();
     //advancedPlayer.seekToNext();
   }
@@ -95,14 +101,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
   //initial music playback
   Future<void> playMusic() async {
     AudioSource metadata = AudioSource.uri(
-      Uri.parse(streamlink),
+      Uri.parse(streamlink[0]),
       tag: MediaItem(
         // Specify a unique ID for each media item:
         id: '1',
         // Metadata to display in the notification:
-        album: author,
-        title: title,
-        artUri: Uri.parse(thumbnail),
+        album: author[0],
+        title: title[0],
+        artUri: Uri.parse(thumbnail[0]),
       ),
     );
     audio = ConcatenatingAudioSource(children: [metadata]);
@@ -159,8 +165,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
       thumbRadius: 8.0,
       timeLabelLocation: TimeLabelLocation.above,
       timeLabelPadding: 5.0,
-      timeLabelTextStyle:
-          GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.bold),
+      timeLabelTextStyle: GoogleFonts.poppins(
+          fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
       onSeek: (duration) {
         advancedPlayer.seek(duration);
       },
@@ -169,17 +175,21 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return SafeArea(
         child: Scaffold(
       backgroundColor: const Color(0XFF242424),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.deepPurple.shade800.withOpacity(0.8),
-              Colors.deepPurple.shade200.withOpacity(0.8),
+              Color(0XFF16222A),
+              Color(0XFF3A6073),
             ],
           ),
         ),
@@ -205,6 +215,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   fontSize: 20.0, fontWeight: FontWeight.w400),
             ),
             actions: [
+              IconButton(
+                onPressed: () {
+                  advancedPlayer.dispose();
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          child: const SearchScreen(),
+                          type: PageTransitionType.rightToLeft));
+                },
+                icon: const Icon(Icons.search),
+              ),
+              /*
               PopupMenuButton(
                 icon: const FaIcon(FontAwesomeIcons.ellipsisVertical,
                     color: Colors.white),
@@ -225,6 +247,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ))
                 ],
               )
+              */
             ],
           ),
           body: Column(
@@ -235,11 +258,28 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   child: Center(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(25.0),
-                      child: Image.network(
-                        thumbnail,
+                      child: CachedNetworkImage(
+                        imageUrl: thumbnail[advancedPlayer.currentIndex ?? 0]
+                                .contains('?sqp=')
+                            ? thumbnail[advancedPlayer.currentIndex ?? 0]
+                                .split('?sqp=')[0]
+                            : thumbnail[advancedPlayer.currentIndex ?? 0],
                         width: 320.0,
-                        height: 300.0,
+                        height: 320.0,
                         fit: BoxFit.fill,
+                        errorWidget: (context, url, error) {
+                          return Shimmer.fromColors(
+                            baseColor: const Color.fromARGB(255, 167, 158, 173),
+                            highlightColor:
+                                const Color.fromARGB(255, 152, 81, 223),
+                            child: Container(
+                              height: 320.0,
+                              width: 320.0,
+                              decoration:
+                                  const BoxDecoration(color: Colors.white),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -249,27 +289,56 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   child: Column(
                     children: [
                       SizedBox(
-                        child: Text(
-                          title,
-                          style: GoogleFonts.poppins(
-                            fontSize: 25.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                          child: title[advancedPlayer.currentIndex ?? 0] != ""
+                              ? Text(
+                                  title[advancedPlayer.currentIndex ?? 0],
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 25.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Shimmer.fromColors(
+                                    baseColor: Colors.white60,
+                                    highlightColor:
+                                        const Color.fromARGB(255, 152, 81, 223),
+                                    child: Container(
+                                      height: 20.0,
+                                      width: 350.0,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white70,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8.0))),
+                                    ),
+                                  ),
+                                )),
                       SizedBox(
-                        child: Text(
-                          author,
-                          style: GoogleFonts.poppins(
-                            fontSize: 20.0,
-                            color: Colors.white60,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                          child: author[advancedPlayer.currentIndex ?? 0] != ""
+                              ? Text(
+                                  author[advancedPlayer.currentIndex ?? 0],
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 20.0,
+                                    color: Colors.white60,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                )
+                              : Shimmer.fromColors(
+                                  baseColor: Colors.white60,
+                                  highlightColor:
+                                      const Color.fromARGB(255, 152, 81, 223),
+                                  child: Container(
+                                    height: 15.0,
+                                    width: 350.0,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white70,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0)),
+                                  ),
+                                )),
                     ],
                   ),
                 ),
@@ -302,7 +371,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           ),
                           onTap: () {
                             setState(() {
-                              advancedPlayer.seek(Duration.zero);
+                              if (advancedPlayer.hasPrevious) {
+                                advancedPlayer.seekToPrevious();
+                              } else {
+                                advancedPlayer.seek(Duration.zero);
+                              }
                             });
                           },
                         ),
@@ -359,18 +432,20 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
-                        backgroundColor: const Color.fromARGB(255, 55, 13, 140),
+                        backgroundColor: const Color.fromARGB(255, 46, 59, 66),
                         builder: (context) {
                           return SizedBox(
                             height: 500,
                             child: ListTile(
-                              leading: Image.network(thumbnail),
+                              leading: Image.network(
+                                  thumbnail[advancedPlayer.currentIndex ?? 0]),
                               title: Text(
-                                title,
+                                title[advancedPlayer.currentIndex ?? 0],
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                               ),
-                              subtitle: Text(author),
+                              subtitle: Text(
+                                  author[advancedPlayer.currentIndex ?? 0]),
                             ),
                           );
                         },

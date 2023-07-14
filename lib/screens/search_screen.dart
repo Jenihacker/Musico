@@ -4,8 +4,9 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:music_player/screens/about_screen.dart';
 import 'package:music_player/screens/home_screen.dart';
-import 'package:music_player/screens/search_results1.dart';
+import 'package:music_player/screens/search_results.dart';
 import 'package:page_transition/page_transition.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
           },
         ),
       ),
-      backgroundColor: const Color(0XFF1F1545),
+      backgroundColor: const Color(0XFF16222A),
       body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -61,12 +62,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       Navigator.push(
                           context,
                           PageTransition(
-                              child: SearchResultScreen1(message: value),
+                              child: SearchResultScreen(message: value),
                               type: PageTransitionType.rightToLeftWithFade));
                     },
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0XFF302360),
+                      fillColor: const Color.fromARGB(255, 46, 59, 66),
                       hintText: 'Enter the song',
                       prefixIcon: const Icon(
                         Icons.search,
@@ -96,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           color: Colors.white,
                         ),
                       ),
-                      tileColor: const Color(0XFF302360),
+                      tileColor: const Color.fromARGB(255, 46, 59, 66),
                     );
                   },
                   getImmediateSuggestions: true,
@@ -104,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   onSuggestionSelected: (suggestion) {
                     Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) {
-                        return SearchResultScreen1(message: suggestion);
+                        return SearchResultScreen(message: suggestion);
                       },
                     ));
                   },
@@ -113,17 +114,34 @@ class _SearchScreenState extends State<SearchScreen> {
                 )),
               ])),
       bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: const Color(0XFF1F1545),
+          backgroundColor: const Color.fromARGB(255, 39, 47, 52),
           elevation: 0,
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white,
           onTap: (value) {
             switch (value) {
               case 0:
-                Get.to(() => const HomeScreen());
+                Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        child: const HomeScreen()));
                 break;
               case 1:
-                Get.to(() => const SearchScreen());
+                Navigator.push(
+                    context,
+                    PageTransition(
+                        type: PageTransitionType.leftToRight,
+                        duration: const Duration(milliseconds: 300),
+                        child: const SearchScreen()));
+                break;
+              case 2:
+                Navigator.push(
+                    context,
+                    PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        duration: const Duration(milliseconds: 300),
+                        child: const AboutScreen()));
                 break;
             }
           },
@@ -142,6 +160,11 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               label: 'search',
             ),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.info_outline,
+                ),
+                label: 'About'),
           ]),
     ));
   }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:music_player/modals/playlist_songs.dart';
 import 'package:http/http.dart' as http;
-import 'package:music_player/screens/player_screen1.dart';
+import 'package:music_player/screens/player_screen.dart';
 import 'package:music_player/shimmers/playlist_shimmer.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -25,12 +25,13 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color.fromARGB(255, 31, 20, 81),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
               leading: IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.arrow_back_ios)),
             ),
-            backgroundColor: const Color.fromARGB(255, 21, 8, 59),
+            backgroundColor: const Color(0XFF16222A),
             body: FutureBuilder(
                 future: getPlaylist(widget.playlistId),
                 builder: (context, snapshot) {
