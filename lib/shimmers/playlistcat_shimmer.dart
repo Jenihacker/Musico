@@ -7,8 +7,8 @@ class PlaylistCatShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: const Color.fromARGB(255, 98, 95, 100),
-      highlightColor: const Color.fromARGB(255, 152, 81, 223),
+      baseColor: Colors.white70,
+      highlightColor: Colors.white,
       child: Column(
         children: [
           ClipRRect(
@@ -17,7 +17,7 @@ class PlaylistCatShimmer extends StatelessWidget {
               width: 160,
               height: 160,
               decoration: const BoxDecoration(
-                color: Colors.grey,
+                color: Colors.black38,
               ),
             ),
           ),
@@ -26,7 +26,7 @@ class PlaylistCatShimmer extends StatelessWidget {
             child: Text(
               "",
               style: TextStyle(
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.black38,
               ),
             ),
           )

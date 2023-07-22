@@ -7,8 +7,8 @@ class PlaylistShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey,
-      highlightColor: const Color.fromARGB(255, 152, 81, 223),
+      baseColor: Colors.white70,
+      highlightColor: Colors.white,
       child: Column(
         children: [
           Center(
@@ -19,7 +19,7 @@ class PlaylistShimmer extends StatelessWidget {
                 child: Container(
                   width: 250,
                   height: 250,
-                  decoration: const BoxDecoration(color: Colors.grey),
+                  decoration: const BoxDecoration(color: Colors.black38),
                 ),
               ),
             ),
@@ -29,7 +29,7 @@ class PlaylistShimmer extends StatelessWidget {
               height: 20,
               width: 250,
               decoration: BoxDecoration(
-                  color: Colors.grey.shade500,
+                  color: Colors.black38,
                   borderRadius: BorderRadius.circular(10.0)),
             ),
           ),
@@ -40,9 +40,9 @@ class PlaylistShimmer extends StatelessWidget {
             child: Container(
               height: 30,
               width: 350,
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade500,
-                  borderRadius: const BorderRadius.all(Radius.circular(10.0))),
+              decoration: const BoxDecoration(
+                  color: Colors.black38,
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
             ),
           ),
           const SizedBox(
@@ -57,19 +57,19 @@ class PlaylistShimmer extends StatelessWidget {
                     leading: Container(
                       width: 80,
                       height: 80,
-                      decoration: const BoxDecoration(color: Colors.grey),
+                      decoration: const BoxDecoration(color: Colors.black38),
                     ),
                     title: Container(
                       height: 14,
                       decoration: const BoxDecoration(
-                          color: Colors.grey,
+                          color: Colors.black38,
                           borderRadius:
                               BorderRadius.all(Radius.circular(16.0))),
                     ),
                     subtitle: Container(
                       height: 14,
                       decoration: const BoxDecoration(
-                          color: Colors.grey,
+                          color: Colors.black38,
                           borderRadius:
                               BorderRadius.all(Radius.circular(16.0))),
                     ),

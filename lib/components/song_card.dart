@@ -39,9 +39,7 @@ class _SongCardState extends State<SongCard> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: CachedNetworkImageProvider(
-                    widget.thumbnail,
-                  ),
+                  image: CachedNetworkImageProvider(widget.thumbnail),
                 ),
               ),
             ),

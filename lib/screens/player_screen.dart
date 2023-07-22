@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:music_player/screens/search_screen.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:marquee/marquee.dart';
 
 class PlayerScreen extends StatefulWidget {
   final String vd;
@@ -21,7 +22,10 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  AudioPlayer advancedPlayer = AudioPlayer();
+  AudioPlayer advancedPlayer = AudioPlayer(
+    handleInterruptions: true,
+    androidApplyAudioAttributes: true,
+  );
   Duration _currentslidervalue = Duration.zero;
   bool _isLoop = false;
   bool _isMute = false;
@@ -64,6 +68,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void dispose() {
     super.dispose();
+    advancedPlayer.stop();
     advancedPlayer.dispose();
   }
 
@@ -151,12 +156,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
+  void _dragdownpop() async {
+    await advancedPlayer.dispose();
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
+  }
+
   Widget slider() {
     return ProgressBar(
       progress: _currentslidervalue,
       buffered: advancedPlayer.bufferedPosition,
       total: advancedPlayer.duration ?? Duration.zero,
-      progressBarColor: const Color.fromARGB(255, 255, 203, 220),
+      progressBarColor: Colors.deepOrange,
       baseBarColor: Colors.white.withOpacity(0.24),
       bufferedBarColor: Colors.white.withOpacity(0.3),
       thumbColor: Colors.white,
@@ -180,280 +191,333 @@ class _PlayerScreenState extends State<PlayerScreen> {
       DeviceOrientation.portraitDown,
     ]);
     return SafeArea(
-        child: Scaffold(
-      backgroundColor: const Color(0XFF242424),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0XFF16222A),
-              Color(0XFF3A6073),
-            ],
+        child: Dismissible(
+      key: Key("$advancedPlayer.currentIndex"),
+      direction: DismissDirection.down,
+      onDismissed: (direction) => _dragdownpop(),
+      child: Scaffold(
+        backgroundColor: const Color(0XFF242424),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomRight,
+              end: Alignment.topLeft,
+              colors: [
+                Color(0XFFDE2342),
+                Color(0XFF2E49D0),
+              ],
+            ),
           ),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-                size: 35,
-              ),
-              onPressed: () {
-                advancedPlayer.dispose();
-                Get.back();
-              },
-            ),
-            centerTitle: true,
-            title: Text(
-              'Now Playing',
-              style: GoogleFonts.poppins(
-                  fontSize: 20.0, fontWeight: FontWeight.w400),
-            ),
-            actions: [
-              IconButton(
+          child: Scaffold(
+            backgroundColor: Colors.black54,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 35,
+                ),
                 onPressed: () {
                   advancedPlayer.dispose();
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          child: const SearchScreen(),
-                          type: PageTransitionType.rightToLeft));
+                  Get.back();
                 },
-                icon: const Icon(Icons.search),
               ),
-              /*
-              PopupMenuButton(
-                icon: const FaIcon(FontAwesomeIcons.ellipsisVertical,
-                    color: Colors.white),
-                color: const Color(0XFF242424),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    child: Text(
-                      'sample 1',
+              centerTitle: true,
+              title: Text(
+                'Now Playing',
+                style: GoogleFonts.poppins(
+                    fontSize: 20.0, fontWeight: FontWeight.w400),
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    advancedPlayer.dispose();
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            child: const SearchScreen(),
+                            type: PageTransitionType.rightToLeft));
+                  },
+                  icon: const Icon(Icons.search),
+                ),
+                /*
+                PopupMenuButton(
+                  icon: const FaIcon(FontAwesomeIcons.ellipsisVertical,
+                      color: Colors.white),
+                  color: const Color(0XFF242424),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      child: Text(
+                        'sample 1',
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                      child: Text(
-                    'sample 2',
-                  )),
-                  const PopupMenuItem(
-                      child: Text(
-                    'sample 3',
-                  ))
-                ],
-              )
-              */
-            ],
-          ),
-          body: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 30.0),
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25.0),
-                      child: CachedNetworkImage(
-                        imageUrl: thumbnail[advancedPlayer.currentIndex ?? 0]
-                                .contains('?sqp=')
-                            ? thumbnail[advancedPlayer.currentIndex ?? 0]
-                                .split('?sqp=')[0]
-                            : thumbnail[advancedPlayer.currentIndex ?? 0],
-                        width: 320.0,
-                        height: 320.0,
-                        fit: BoxFit.fill,
-                        errorWidget: (context, url, error) {
-                          return Shimmer.fromColors(
-                            baseColor: const Color.fromARGB(255, 167, 158, 173),
-                            highlightColor:
-                                const Color.fromARGB(255, 152, 81, 223),
-                            child: Container(
-                              height: 320.0,
-                              width: 320.0,
-                              decoration:
-                                  const BoxDecoration(color: Colors.white),
-                            ),
-                          );
-                        },
+                    const PopupMenuItem(
+                        child: Text(
+                      'sample 2',
+                    )),
+                    const PopupMenuItem(
+                        child: Text(
+                      'sample 3',
+                    ))
+                  ],
+                )
+                */
+              ],
+            ),
+            body: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.0375),
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) {
+                            return Shimmer.fromColors(
+                              baseColor: Colors.white70,
+                              highlightColor: Colors.white,
+                              child: Container(
+                                height: 320.0,
+                                width: 320.0,
+                                decoration:
+                                    const BoxDecoration(color: Colors.black38),
+                              ),
+                            );
+                          },
+                          imageUrl: thumbnail[advancedPlayer.currentIndex ?? 0]
+                                  .contains('?sqp=')
+                              ? thumbnail[advancedPlayer.currentIndex ?? 0]
+                                  .split('?sqp=')[0]
+                              : thumbnail[advancedPlayer.currentIndex ?? 0],
+                          width: MediaQuery.of(context).size.height * 0.387,
+                          height: MediaQuery.of(context).size.height * 0.387,
+                          fit: BoxFit.fill,
+                          errorWidget: (context, url, error) {
+                            return Shimmer.fromColors(
+                              baseColor: Colors.white70,
+                              highlightColor: Colors.white,
+                              child: Container(
+                                height: 320.0,
+                                width: 320.0,
+                                decoration:
+                                    const BoxDecoration(color: Colors.black38),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                          child: title[advancedPlayer.currentIndex ?? 0] != ""
-                              ? Text(
-                                  title[advancedPlayer.currentIndex ?? 0],
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 25.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Shimmer.fromColors(
-                                    baseColor: Colors.white60,
-                                    highlightColor:
-                                        const Color.fromARGB(255, 152, 81, 223),
-                                    child: Container(
-                                      height: 20.0,
-                                      width: 350.0,
-                                      decoration: const BoxDecoration(
-                                          color: Colors.white70,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8.0))),
-                                    ),
-                                  ),
-                                )),
-                      SizedBox(
-                          child: author[advancedPlayer.currentIndex ?? 0] != ""
-                              ? Text(
-                                  author[advancedPlayer.currentIndex ?? 0],
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 20.0,
-                                    color: Colors.white60,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                )
-                              : Shimmer.fromColors(
-                                  baseColor: Colors.white60,
-                                  highlightColor:
-                                      const Color.fromARGB(255, 152, 81, 223),
-                                  child: Container(
-                                    height: 15.0,
-                                    width: 350.0,
-                                    decoration: BoxDecoration(
-                                        color: Colors.white70,
-                                        borderRadius:
-                                            BorderRadius.circular(8.0)),
-                                  ),
-                                )),
-                    ],
-                  ),
-                ),
-                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 10.0, right: 10.0, bottom: 15.0),
-                    child: slider(),
-                  ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Column(
                       children: [
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: Icon(
-                            _isMute ? Icons.volume_off : Icons.volume_up,
-                            color: Colors.white,
-                            size: 35.0,
+                        SizedBox(
+                            child: title[advancedPlayer.currentIndex ?? 0] != ""
+                                ? title[advancedPlayer.currentIndex ?? 0]
+                                            .length <=
+                                        26
+                                    ? Text(
+                                        title[advancedPlayer.currentIndex ?? 0],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 25.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                      )
+                                    : SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.05,
+                                        child: Marquee(
+                                          accelerationCurve: Curves.bounceIn,
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.w700),
+                                          blankSpace: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4,
+                                          text: title[
+                                              advancedPlayer.currentIndex ?? 0],
+                                          scrollAxis: Axis.horizontal,
+                                        ),
+                                      )
+                                : Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, bottom: 10.0),
+                                    child: Shimmer.fromColors(
+                                      baseColor: Colors.white24,
+                                      highlightColor: Colors.white60,
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.024,
+                                        width: 350.0,
+                                        decoration: const BoxDecoration(
+                                            color: Colors.black,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(8.0))),
+                                      ),
+                                    ),
+                                  )),
+                        SizedBox(
+                            child: author[advancedPlayer.currentIndex ?? 0] !=
+                                    ""
+                                ? Text(
+                                    author[advancedPlayer.currentIndex ?? 0],
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 20.0,
+                                      color: Colors.white60,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                  )
+                                : Shimmer.fromColors(
+                                    baseColor: Colors.white24,
+                                    highlightColor: Colors.white60,
+                                    child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.018,
+                                      width: 350.0,
+                                      decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0)),
+                                    ),
+                                  )),
+                      ],
+                    ),
+                  ),
+                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10.0, right: 10.0, bottom: 15.0),
+                      child: slider(),
+                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          InkWell(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: Icon(
+                              _isMute ? Icons.volume_off : Icons.volume_up,
+                              color: Colors.white,
+                              size: 35.0,
+                            ),
+                            onTap: () {
+                              _setMute();
+                            },
                           ),
-                          onTap: () {
-                            _setMute();
-                          },
-                        ),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: const Icon(
-                            Icons.skip_previous_rounded,
-                            color: Colors.white,
-                            size: 50.0,
-                          ),
-                          onTap: () {
-                            setState(() {
+                          InkWell(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: const Icon(
+                              Icons.skip_previous_rounded,
+                              color: Colors.white,
+                              size: 50.0,
+                            ),
+                            onTap: () async {
                               if (advancedPlayer.hasPrevious) {
-                                advancedPlayer.seekToPrevious();
+                                //await advancedPlayer.pause();
+                                await advancedPlayer.seekToPrevious();
+                                //await advancedPlayer.play();
                               } else {
                                 advancedPlayer.seek(Duration.zero);
                               }
-                            });
-                          },
-                        ),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: Icon(
-                            advancedPlayer.playing
-                                ? Icons.pause_circle
-                                : Icons.play_circle,
-                            color: Colors.white,
-                            size: 80.0,
+                            },
                           ),
-                          onTap: () {
-                            _togglePlayback();
-                          },
-                        ),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20.0),
-                          onTap: () async {
-                            _playNextSong(videoid);
-                          },
-                          child: const Icon(
-                            Icons.skip_next_rounded,
-                            color: Colors.white,
-                            size: 50.0,
-                          ),
-                        ),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20.0),
-                          onTap: () {
-                            _setloop();
-                          },
-                          child: Icon(
-                            _isLoop ? Icons.repeat_one : Icons.repeat,
-                            color: Colors.white,
-                            size: 35.0,
-                          ),
-                        )
-                      ]),
-                ]),
-                Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.075,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20)),
-                      boxShadow: [BoxShadow(color: Colors.black45)]),
-                  child: IconButton(
-                    icon: const Icon(Icons.playlist_play_outlined),
-                    color: Colors.white,
-                    iconSize: 30,
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: const Color.fromARGB(255, 46, 59, 66),
-                        builder: (context) {
-                          return SizedBox(
-                            height: 500,
-                            child: ListTile(
-                              leading: Image.network(
-                                  thumbnail[advancedPlayer.currentIndex ?? 0]),
-                              title: Text(
-                                title[advancedPlayer.currentIndex ?? 0],
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                              subtitle: Text(
-                                  author[advancedPlayer.currentIndex ?? 0]),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: Icon(
+                              advancedPlayer.playing
+                                  ? Icons.pause_circle
+                                  : Icons.play_circle,
+                              color: Colors.white,
+                              size: 80.0,
                             ),
-                          );
-                        },
-                      );
-                    },
+                            onTap: () {
+                              _togglePlayback();
+                            },
+                          ),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(20.0),
+                            onTap: () async {
+                              if (advancedPlayer.hasNext) {
+                                //await advancedPlayer.pause();
+                                await advancedPlayer.seekToNext();
+                                //await advancedPlayer.play();
+                              } else {
+                                _playNextSong(videoid);
+                              }
+                            },
+                            child: const Icon(
+                              Icons.skip_next_rounded,
+                              color: Colors.white,
+                              size: 50.0,
+                            ),
+                          ),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(20.0),
+                            onTap: () {
+                              _setloop();
+                            },
+                            child: Icon(
+                              _isLoop ? Icons.repeat_one : Icons.repeat,
+                              color: Colors.white,
+                              size: 35.0,
+                            ),
+                          )
+                        ]),
+                  ]),
+                  Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.075,
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20)),
+                        boxShadow: [BoxShadow(color: Colors.black45)]),
+                    child: IconButton(
+                      icon: const Icon(Icons.playlist_play_outlined),
+                      color: Colors.white,
+                      iconSize: 30,
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.black26,
+                          builder: (context) {
+                            return Container(
+                              decoration:
+                                  const BoxDecoration(color: Colors.black45),
+                              height: 500,
+                              child: ListTile(
+                                leading: Image.network(thumbnail[
+                                    advancedPlayer.currentIndex ?? 0]),
+                                title: Text(
+                                  title[advancedPlayer.currentIndex ?? 0],
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                subtitle: Text(
+                                    author[advancedPlayer.currentIndex ?? 0]),
+                                //tileColor: Colors.white30,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ]),
+                ]),
+          ),
         ),
       ),
     ));

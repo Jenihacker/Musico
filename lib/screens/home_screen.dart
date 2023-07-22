@@ -1,4 +1,4 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+//import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:music_player/components/playlist_container.dart';
@@ -35,12 +35,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
+      child: Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.topLeft,
+                colors: [
+              Color(0XFF780206),
+              Color(0XFF061161),
+            ])),
+        child: Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
             elevation: 0,
             toolbarHeight: 65.0,
-            backgroundColor: const Color.fromARGB(255, 39, 47, 52),
+            backgroundColor: Colors.black26,
             title: Text(
               settext,
               style: GoogleFonts.poppins(
@@ -58,21 +67,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           type: PageTransitionType.rightToLeft)),
                   child: const CircleAvatar(
                     radius: 25,
-                    backgroundColor: Colors.white,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 0.0),
-                      child: Image(
-                        image: AssetImage('assets/images/playstore.png'),
-                        width: 45,
-                        height: 45,
-                      ),
+                    backgroundColor: Colors.white70,
+                    child: Image(
+                      image: AssetImage('assets/images/playstore.png'),
+                      width: 40,
+                      height: 40,
                     ),
                   ),
                 ),
               )
             ],
           ),
-          backgroundColor: const Color(0XFF16222A),
+          backgroundColor: Colors.black26,
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -170,101 +176,106 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          bottomNavigationBar: /*BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: const Color.fromARGB(255, 39, 47, 52),
-            elevation: 0,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white,
-            onTap: (value) {
-              switch (value) {
-                case 0:
-                  Navigator.pushReplacement(
-                      context,
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          child: const HomeScreen()));
-                  break;
-                case 1:
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          duration: const Duration(milliseconds: 300),
-                          child: const SearchScreen()));
-                  break;
-                case 2:
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          duration: const Duration(milliseconds: 300),
-                          child: const AboutScreen()));
-                  break;
-              }
-            },
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.home,
-                    color: Colors.white,
-                  ),
-                  label: 'home'),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  label: 'search'),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.info_outline,
-                  ),
-                  label: 'About'),
-            ]),*/
-              CurvedNavigationBar(
-                  animationDuration: const Duration(milliseconds: 300),
-                  onTap: (value) {
-                    if (value != currentIndex) {
-                      switch (value) {
-                        case 0:
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  child: const HomeScreen()));
-                          currentIndex = value;
-                          break;
-                        case 1:
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: const SearchScreen()));
-                          currentIndex = value;
-                          break;
-                        case 2:
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: const AboutScreen()));
-                          currentIndex = value;
-                          break;
-                      }
-                    }
-                  },
-                  backgroundColor: Colors.transparent,
-                  buttonBackgroundColor: Colors.white,
-                  color: Colors.white12,
-                  height: MediaQuery.of(context).size.height * 0.07,
-                  items: const [
-                Icon(Icons.home),
-                Icon(Icons.search),
-                Icon(Icons.info),
-              ])),
+          bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Colors.black54,
+              elevation: 0,
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white,
+              onTap: (value) {
+                switch (value) {
+                  case 0:
+                    Navigator.pushReplacement(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            child: const HomeScreen()));
+                    break;
+                  case 1:
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            duration: const Duration(milliseconds: 300),
+                            child: const SearchScreen()));
+                    break;
+                  case 2:
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            duration: const Duration(milliseconds: 300),
+                            child: const AboutScreen()));
+                    break;
+                }
+              },
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.home,
+                      color: Colors.white,
+                    ),
+                    label: 'home'),
+                BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.search_outlined,
+                      color: Colors.white,
+                    ),
+                    label: 'search'),
+                BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.info_outline,
+                    ),
+                    label: 'About'),
+              ]), /*
+                Container(
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),),
+                  child: CurvedNavigationBar(
+                      animationDuration: const Duration(milliseconds: 300),
+                      onTap: (value) {
+                        if (value != currentIndex) {
+                          switch (value) {
+                            case 0:
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      child: const HomeScreen()));
+                              currentIndex = value;
+                              break;
+                            case 1:
+                              Navigator.push(
+                                  context,
+                                  PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      duration: const Duration(milliseconds: 300),
+                                      child: const SearchScreen()));
+                              currentIndex = value;
+                              break;
+                            case 2:
+                              Navigator.push(
+                                  context,
+                                  PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      duration: const Duration(milliseconds: 300),
+                                      child: const AboutScreen()));
+                              currentIndex = value;
+                              break;
+                          }
+                        }
+                      },
+                      backgroundColor: Colors.transparent,
+                      buttonBackgroundColor: Colors.white,
+                      color: Colors.white12,
+                      height: MediaQuery.of(context).size.height * 0.07,
+                      items: const [
+                    Icon(Icons.home),
+                    Icon(Icons.search),
+                    Icon(Icons.info),
+                  ]),
+                )*/
+        ),
+      ),
     );
   }
 }

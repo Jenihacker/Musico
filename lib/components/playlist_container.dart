@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:music_player/components/song_card.dart';
@@ -25,18 +26,27 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
           if (snapshot.hasData) {
             return SizedBox(
               height: 200,
-              child: ListView.separated(
-                separatorBuilder: (context, index) => const SizedBox(
-                  width: 15,
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.mouse,
+                    PointerDeviceKind.touch,
+                  },
                 ),
-                scrollDirection: Axis.horizontal,
-                itemCount: snapshot.data!.isEmpty ? 10 : snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return SongCard(
-                      playlistname: snapshot.data![index].title,
-                      thumbnail: snapshot.data![index].thumbnails[1].url,
-                      playlistid: snapshot.data![index].playlistId);
-                },
+                child: ListView.separated(
+                  separatorBuilder: (context, index) => const SizedBox(
+                    width: 15,
+                  ),
+                  scrollDirection: Axis.horizontal,
+                  itemCount:
+                      snapshot.data!.isEmpty ? 10 : snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return SongCard(
+                        playlistname: snapshot.data![index].title,
+                        thumbnail: snapshot.data![index].thumbnails[1].url,
+                        playlistid: snapshot.data![index].playlistId);
+                  },
+                ),
               ),
             );
           } else if (snapshot.hasError) {
@@ -74,6 +84,7 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
       for (Map<String, dynamic> item in data) {
         playlistcat.add(PlaylistCategory.fromJson(item));
       }
+      playlistcat.shuffle();
       return playlistcat;
     }
     return playlistcat;
