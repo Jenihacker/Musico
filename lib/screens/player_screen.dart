@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:http/http.dart' as http;
-import 'package:music_player/screens/search_screen.dart';
+import 'package:musico/screens/search_screen.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:marquee/marquee.dart';

@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:music_player/screens/about_screen.dart';
-import 'package:music_player/screens/home_screen.dart';
-import 'package:music_player/screens/search_results.dart';
+import 'package:musico/screens/about_screen.dart';
+import 'package:musico/screens/home_screen.dart';
+import 'package:musico/screens/search_results.dart';
 import 'package:page_transition/page_transition.dart';
 
 class SearchScreen extends StatefulWidget {

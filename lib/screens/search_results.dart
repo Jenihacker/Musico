@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:music_player/modals/search_output.dart';
-import 'package:music_player/screens/player_screen.dart';
+import 'package:musico/modals/search_output.dart';
+import 'package:musico/screens/player_screen.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:music_player/shimmers/searchresult_shimmer.dart';
+import 'package:musico/shimmers/searchresult_shimmer.dart';
 
 class SearchResultScreen extends StatefulWidget {
   final dynamic message;

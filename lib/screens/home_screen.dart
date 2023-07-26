@@ -1,9 +1,9 @@
 //import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:music_player/components/playlist_container.dart';
-import 'package:music_player/screens/about_screen.dart';
-import 'package:music_player/screens/search_screen.dart';
+import 'package:musico/components/playlist_container.dart';
+import 'package:musico/screens/about_screen.dart';
+import 'package:musico/screens/search_screen.dart';
 import 'package:page_transition/page_transition.dart';
 
 class HomeScreen extends StatefulWidget {

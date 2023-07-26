@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:music_player/modals/playlist_songs.dart';
+import 'package:musico/modals/playlist_songs.dart';
 import 'package:http/http.dart' as http;
-import 'package:music_player/screens/player_screen.dart';
-import 'package:music_player/shimmers/playlist_shimmer.dart';
+import 'package:musico/screens/player_screen.dart';
+import 'package:musico/shimmers/playlist_shimmer.dart';
 import 'package:page_transition/page_transition.dart';
 
 // ignore: must_be_immutable

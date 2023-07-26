@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:music_player/components/song_card.dart';
-import 'package:music_player/shimmers/playlistcat_shimmer.dart';
-import '../modals/playlist_category.dart';
+import 'package:musico/components/song_card.dart';
+import 'package:musico/shimmers/playlistcat_shimmer.dart';
+import 'package:musico/modals/playlist_category.dart';
 
 class PlaylistContainer extends StatefulWidget {
   final String title;

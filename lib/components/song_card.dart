@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:music_player/screens/playlist_screen.dart';
+import 'package:musico/screens/playlist_screen.dart';
 import 'package:page_transition/page_transition.dart';
 
 // ignore: must_be_immutable
