@@ -30,6 +30,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Duration _currentslidervalue = Duration.zero;
   bool _isLoop = false;
   bool _isMute = false;
+  bool _isPlaying = false;
+  int currentIndex = 0;
   List<String> title = [""];
   List<String> author = [""];
   List<String> thumbnail = [""];
@@ -42,15 +44,25 @@ class _PlayerScreenState extends State<PlayerScreen> {
   void initState() {
     super.initState();
     _initializeSongDetails(widget.vd);
+    advancedPlayer.playingStream.listen((event) {
+      setState(() {
+        _isPlaying = event;
+      });
+    });
     advancedPlayer.positionStream.listen((event) {
       setState(() {
         _currentslidervalue = event;
       });
     });
+    advancedPlayer.currentIndexStream.listen((event) {
+      setState(() {
+        currentIndex = event ?? 0;
+      });
+    });
     advancedPlayer.setVolume(1.0);
     advancedPlayer.playerStateStream.listen((playerState) {
       if (playerState.processingState == ProcessingState.completed) {
-        _playNextSong(videoid[advancedPlayer.currentIndex ?? 0]);
+        _playNextSong(videoid[currentIndex]);
       }
     });
   }
@@ -91,7 +103,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     } else if (value.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
       _playPrevSong();
     } else if (value.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
-      _playNextSong(videoid[advancedPlayer.currentIndex ?? 0]);
+      _playNextSong(videoid[currentIndex]);
     }
   }
 
@@ -256,7 +268,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       },
       child: SafeArea(
           child: Dismissible(
-        key: Key("$advancedPlayer.currentIndex"),
+        key: Key("$currentIndex"),
         direction: DismissDirection.down,
         onDismissed: (direction) => _dragdownpop(),
         child: Scaffold(
@@ -265,8 +277,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: CachedNetworkImageProvider(
-                        thumbnail[advancedPlayer.currentIndex ?? 0]))
+                    image: CachedNetworkImageProvider(thumbnail[currentIndex]))
                 // gradient: LinearGradient(
                 //   begin: Alignment.bottomRight,
                 //   end: Alignment.topLeft,
@@ -344,7 +355,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10.0),
                               child: CachedNetworkImage(
-                                key: UniqueKey(),
                                 placeholder: (context, url) {
                                   return Shimmer.fromColors(
                                     baseColor: Colors.white70,
@@ -361,15 +371,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     ),
                                   );
                                 },
-                                imageUrl:
-                                    thumbnail[advancedPlayer.currentIndex ?? 0]
-                                            .contains('?sqp=')
-                                        ? thumbnail[
-                                                advancedPlayer.currentIndex ??
-                                                    0]
-                                            .split('?sqp=')[0]
-                                        : thumbnail[
-                                            advancedPlayer.currentIndex ?? 0],
+                                imageUrl: thumbnail[currentIndex]
+                                        .contains('?sqp=')
+                                    ? thumbnail[currentIndex].split('?sqp=')[0]
+                                    : thumbnail[currentIndex],
                                 width:
                                     MediaQuery.of(context).size.height * 0.387,
                                 height:
@@ -404,15 +409,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         child: Column(
                           children: [
                             SizedBox(
-                                child: title[
-                                            advancedPlayer.currentIndex ?? 0] !=
-                                        ""
-                                    ? title[advancedPlayer.currentIndex ?? 0]
-                                                .length <=
-                                            28
+                                child: title[currentIndex] != ""
+                                    ? title[currentIndex].length <= 28
                                         ? Text(
-                                            title[advancedPlayer.currentIndex ??
-                                                0],
+                                            title[currentIndex],
                                             style: GoogleFonts.poppins(
                                               fontSize: 25.0,
                                               fontWeight: FontWeight.w500,
@@ -438,9 +438,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                       .size
                                                       .width *
                                                   0.4,
-                                              text: title[
-                                                  advancedPlayer.currentIndex ??
-                                                      0],
+                                              text: title[currentIndex],
                                               scrollAxis: Axis.horizontal,
                                             ),
                                           )
@@ -464,12 +462,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                         ),
                                       )),
                             SizedBox(
-                                child: author[
-                                            advancedPlayer.currentIndex ?? 0] !=
-                                        ""
+                                child: author[currentIndex] != ""
                                     ? Text(
-                                        author[
-                                            advancedPlayer.currentIndex ?? 0],
+                                        author[currentIndex],
                                         style: GoogleFonts.poppins(
                                           fontSize: 20.0,
                                           color: Colors.white60,
@@ -535,7 +530,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   InkWell(
                                     borderRadius: BorderRadius.circular(20.0),
                                     child: Icon(
-                                      advancedPlayer.playing
+                                      _isPlaying
                                           ? Icons.pause_circle_filled
                                           : Icons.play_circle,
                                       color: Colors.white,
@@ -549,12 +544,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     borderRadius: BorderRadius.circular(20.0),
                                     onTap: () async {
                                       if (advancedPlayer.hasNext) {
-                                        //await advancedPlayer.pause();
+                                        await advancedPlayer.pause();
                                         await advancedPlayer.seekToNext();
-                                        //await advancedPlayer.play();
+                                        await advancedPlayer.play();
                                       } else {
-                                        _playNextSong(videoid[
-                                            advancedPlayer.currentIndex ?? 0]);
+                                        _playNextSong(videoid[currentIndex]);
                                       }
                                     },
                                     child: const Icon(
@@ -615,8 +609,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     MediaQuery.of(context).size.height * 0.325,
                                 child: SingleChildScrollView(
                                   child: FutureBuilder(
-                                    future: getLyrics(videoid[
-                                        advancedPlayer.currentIndex ?? 0]),
+                                    future: getLyrics(videoid[currentIndex]),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
                                         return Text(

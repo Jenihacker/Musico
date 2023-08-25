@@ -268,59 +268,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     hideOnEmpty: true,
                   )),
                 ])),
-        // bottomNavigationBar: BottomNavigationBar(
-        //     backgroundColor: Colors.black38,
-        //     elevation: 0,
-        //     selectedItemColor: Colors.white,
-        //     unselectedItemColor: Colors.white,
-        //     onTap: (value) {
-        //       switch (value) {
-        //         case 0:
-        //           Navigator.pushReplacement(
-        //               context,
-        //               PageTransition(
-        //                   type: PageTransitionType.rightToLeft,
-        //                   child: const HomeScreen()));
-        //           break;
-        //         case 1:
-        //           Navigator.push(
-        //               context,
-        //               PageTransition(
-        //                   type: PageTransitionType.leftToRight,
-        //                   duration: const Duration(milliseconds: 300),
-        //                   child: const SearchScreen()));
-        //           break;
-        //         case 2:
-        //           Navigator.push(
-        //               context,
-        //               PageTransition(
-        //                   type: PageTransitionType.rightToLeft,
-        //                   duration: const Duration(milliseconds: 300),
-        //                   child: const AboutScreen()));
-        //           break;
-        //       }
-        //     },
-        //     items: const [
-        //       BottomNavigationBarItem(
-        //         icon: Icon(
-        //           Icons.home,
-        //           color: Colors.white,
-        //         ),
-        //         label: 'home',
-        //       ),
-        //       BottomNavigationBarItem(
-        //         icon: Icon(
-        //           Icons.search,
-        //           color: Colors.white,
-        //         ),
-        //         label: 'search',
-        //       ),
-        //       BottomNavigationBarItem(
-        //           icon: Icon(
-        //             Icons.info_outline,
-        //           ),
-        //           label: 'About'),
-        //     ]),
       ),
     ));
   }
