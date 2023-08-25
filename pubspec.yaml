@@ -30,29 +30,33 @@ environment:
 dependencies:
   audio_service: ^0.18.10
   audio_video_progress_bar: ^1.0.1
+  avatar_glow: ^2.0.2
+  bootstrap_icons: ^1.10.5+2
   cached_network_image: ^3.2.3
   convert: ^3.1.1
   cupertino_icons: ^1.0.2
   curved_navigation_bar: ^1.0.3
   flutter:
     sdk: flutter
-  flutter_cache_manager: ^3.3.0
+  flutter_cache_manager: ^3.3.1
   flutter_native_splash: ^2.3.1
-  flutter_typeahead: ^4.4.0
-  font_awesome_flutter: ^10.4.0
+  flutter_typeahead: ^4.6.2
+  font_awesome_flutter: ^10.5.0
   get: ^4.6.5
-  google_fonts: ^4.0.4
-  http: ^0.13.6
-  just_audio: ^0.9.33
+  google_fonts: ^5.1.0
+  http: ^1.1.0
+  just_audio: ^0.9.34
   just_audio_background: ^0.0.1-beta.10
-  lottie: ^2.3.2
+  lottie: ^2.5.0
   marquee: ^2.2.3
+  material_design_icons_flutter: ^7.0.7296
   page_transition: ^2.0.9
   shimmer: ^3.0.0
-  url_launcher: ^6.1.11
+  speech_to_text: ^6.3.0
+  url_launcher: ^6.1.12
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^2.0.2
   flutter_test:
     sdk: flutter
 

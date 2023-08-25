@@ -10,6 +10,7 @@ class SearchResultShimmer extends StatelessWidget {
       baseColor: Colors.white70,
       highlightColor: Colors.white,
       child: ListTile(
+        tileColor: const Color(0XFF1e1c22),
         leading: Container(
           width: 100,
           height: 100,

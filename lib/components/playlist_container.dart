@@ -15,7 +15,7 @@ class PlaylistContainer extends StatefulWidget {
 }
 
 class _PlaylistContainerState extends State<PlaylistContainer> {
-  List<PlaylistCategory> playlistcat = [];
+  final List<PlaylistCategory> playlistcat = [];
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             return SizedBox(
-              height: 200,
+              height: 210,
               child: ScrollConfiguration(
                 behavior: ScrollConfiguration.of(context).copyWith(
                   dragDevices: {
@@ -42,23 +42,21 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
                       snapshot.data!.isEmpty ? 10 : snapshot.data!.length,
                   itemBuilder: (context, index) {
                     return SongCard(
-                        playlistname: snapshot.data![index].title,
-                        thumbnail: snapshot.data![index].thumbnails[1].url,
-                        playlistid: snapshot.data![index].playlistId);
+                        playlistname: playlistcat[index].title,
+                        playlistdesc: playlistcat[index].description,
+                        thumbnail: playlistcat[index].thumbnails[1].url,
+                        playlistid: playlistcat[index].playlistId);
                   },
                 ),
               ),
             );
           } else if (snapshot.hasError) {
-            return Container(
-              decoration: const BoxDecoration(color: Colors.amber),
-              child: const Text('No Network Connectivity'),
-            );
+            return const Text('No Network Connectivity');
           }
           return Container();
         } else {
           return SizedBox(
-            height: 200,
+            height: 210,
             child: ListView.separated(
               separatorBuilder: (context, index) => const SizedBox(
                 width: 15,
@@ -79,12 +77,11 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
     final response = await http
         .get(Uri.parse("https://ytmusic-tau.vercel.app/playlist?cat=$cat"));
     var data = jsonDecode(response.body.toString());
-    List<PlaylistCategory> playlistcat = [];
     if (response.statusCode == 200) {
       for (Map<String, dynamic> item in data) {
         playlistcat.add(PlaylistCategory.fromJson(item));
       }
-      playlistcat.shuffle();
+      //playlistcat.shuffle();
       return playlistcat;
     }
     return playlistcat;

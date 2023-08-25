@@ -18,136 +18,159 @@ class PlaylistScreen extends StatefulWidget {
 }
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
-  late PlaylistSongs playlist;
+  late final PlaylistSongs playlist;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Container(
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.topLeft,
-              colors: [
-            Color(0XFF780206),
-            Color(0XFF061161),
-          ])),
-      child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_ios)),
-          ),
-          backgroundColor: Colors.black38,
-          body: FutureBuilder(
-              future: getPlaylist(widget.playlistId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: [
-                        Center(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(top: 25.0, bottom: 20.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image(
-                                  width: 250,
-                                  height: 250,
-                                  image: CachedNetworkImageProvider(
-                                      snapshot.data!.thumbnails[3].url)),
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Text(
-                            snapshot.data!.title,
-                            style: GoogleFonts.poppins(
-                                fontSize: 25, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: Center(
-                            child: Text(
-                              snapshot.data!.description,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              itemCount: snapshot.data!.tracks.isEmpty
-                                  ? 10
-                                  : snapshot.data!.tracks.length,
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  leading: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    child: Image.network(
-                                      snapshot
-                                          .data!
-                                          .tracks[index]
-                                          .thumbnails[snapshot
-                                                  .data!
-                                                  .tracks[index]
-                                                  .thumbnails
-                                                  .length -
-                                              1]
-                                          .url
-                                          .split('?sqp=')[0],
-                                      fit: BoxFit.cover,
-                                      width: 80,
-                                      height: 80,
+      color: Colors.black,
+      child: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: const Color(0XFFC4FC4C),
+                elevation: 0,
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 5.0, left: 5.0),
+                  child: ElevatedButton(
+                      style: const ButtonStyle(
+                          shape: MaterialStatePropertyAll(CircleBorder()),
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.black)),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Icon(Icons.arrow_back_ios)),
+                ),
+              ),
+              backgroundColor: Colors.black38,
+              body: FutureBuilder(
+                  future: getPlaylist(widget.playlistId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData) {
+                        return Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              decoration: const BoxDecoration(
+                                  color: Color(0XFFC4FC4C),
+                                  borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(40.0),
+                                      bottomRight: Radius.circular(40.0))),
+                              child: Column(children: [
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 25.0, bottom: 20.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      child: Image(
+                                          width: 250,
+                                          height: 250,
+                                          image: CachedNetworkImageProvider(
+                                              snapshot
+                                                  .data!.thumbnails[3].url)),
                                     ),
                                   ),
-                                  title: Text(
-                                    snapshot.data!.tracks[index].title,
-                                    style: GoogleFonts.poppins(fontSize: 15.0),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                ),
+                                Center(
+                                  child: Text(
+                                    snapshot.data!.title,
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.black,
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  subtitle: Text(
-                                    snapshot
-                                        .data!.tracks[index].artists[0].name,
-                                    style: GoogleFonts.poppins(fontSize: 12.0),
+                                ),
+                                Center(
+                                  child: Text(
+                                    snapshot.data!.description,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500),
                                   ),
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            child: PlayerScreen(
-                                                vd: snapshot.data!.tracks[index]
-                                                    .videoId),
-                                            type: PageTransitionType
-                                                .bottomToTop));
-                                  },
-                                );
-                              }),
-                        )
-                      ],
-                    );
-                  } else {
-                    if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('No Network Connectivity'),
-                      );
+                                )
+                              ]),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.39,
+                              child: ListView.builder(
+                                  itemCount: snapshot.data!.tracks.isEmpty
+                                      ? 10
+                                      : snapshot.data!.tracks.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      leading: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        child: Image.network(
+                                          snapshot
+                                              .data!
+                                              .tracks[index]
+                                              .thumbnails[snapshot
+                                                      .data!
+                                                      .tracks[index]
+                                                      .thumbnails
+                                                      .length -
+                                                  1]
+                                              .url
+                                              .split('?sqp=')[0],
+                                          fit: BoxFit.cover,
+                                          width: 80,
+                                          height: 80,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        snapshot.data!.tracks[index].title,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      subtitle: Text(
+                                        snapshot.data!.tracks[index].artists[0]
+                                            .name,
+                                        style:
+                                            GoogleFonts.poppins(fontSize: 12.0),
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                child: PlayerScreen(
+                                                    vd: snapshot.data!
+                                                        .tracks[index].videoId),
+                                                type: PageTransitionType
+                                                    .bottomToTop));
+                                      },
+                                    );
+                                  }),
+                            )
+                          ],
+                        );
+                      } else {
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text('No Network Connectivity'),
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      }
                     } else {
-                      return const CircularProgressIndicator();
+                      return const PlaylistShimmer();
                     }
-                  }
-                } else {
-                  return const PlaylistShimmer();
-                }
-              })),
+                  })),
+        ),
+      ),
     ));
   }
 

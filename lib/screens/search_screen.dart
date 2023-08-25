@@ -1,13 +1,13 @@
 import 'dart:convert';
+import 'package:avatar_glow/avatar_glow.dart';
+import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:musico/screens/about_screen.dart';
-import 'package:musico/screens/home_screen.dart';
 import 'package:musico/screens/search_results.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -18,6 +18,64 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late dynamic message;
+  String recognizedText = "";
+  bool available = false;
+  bool _isListening = false;
+  stt.SpeechToText speech = stt.SpeechToText();
+
+  Future<void> listenSpeech(setState) async {
+    if (!available) {
+      available = await speech.initialize();
+    }
+    if (available) {
+      setState(() {
+        recognizedText = "";
+      });
+      speech.listen(
+        onResult: (result) {
+          setState(() {
+            recognizedText = result.recognizedWords;
+          });
+        },
+      );
+      speech.statusListener = (status) {
+        if (status == 'listening') {
+          setState(() => _isListening = true);
+        }
+        if (status == 'notListening') {
+          setState(() => _isListening = false);
+        }
+        if (status == 'done') {
+          if (recognizedText.isNotEmpty) {
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                PageTransition(
+                    child: SearchResultScreen(message: recognizedText),
+                    type: PageTransitionType.rightToLeft));
+          }
+          setState(() {
+            _isListening = false;
+            recognizedText = "";
+          });
+        }
+      };
+    } else {
+      setState(() {
+        _isListening = false;
+        recognizedText = "Can't Recognize\nVoice";
+      });
+    }
+  }
+
+  void stopSpeech(setState) {
+    if (available) {
+      speech.stop();
+      setState(() {
+        _isListening = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +86,15 @@ class _SearchScreenState extends State<SearchScreen> {
               begin: Alignment.bottomRight,
               end: Alignment.topLeft,
               colors: [
-            Color(0XFF780206),
-            Color(0XFF061161),
+            Colors.black,
+            Colors.black
+            // Color(0XFF780206),
+            // Color(0XFF061161),
           ])),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios,
-            ),
-            onPressed: () {
-              Get.back();
-            },
-          ),
+          backgroundColor: Colors.black,
         ),
         backgroundColor: Colors.black12,
         body: Padding(
@@ -54,7 +106,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   SizedBox(
                     height: 50.0,
                     child: Text('Search',
-                        style: GoogleFonts.audiowide(
+                        style: GoogleFonts.poppins(
                           fontSize: 32.0,
                           fontWeight: FontWeight.w500,
                         )),
@@ -68,18 +120,94 @@ class _SearchScreenState extends State<SearchScreen> {
                         fontSize: 20.0,
                       ),
                       onSubmitted: (value) {
-                        Navigator.push(
-                            context,
-                            PageTransition(
-                                child: SearchResultScreen(message: value),
-                                type: PageTransitionType.rightToLeftWithFade));
+                        if (value.isNotEmpty) {
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                  child: SearchResultScreen(message: value),
+                                  type:
+                                      PageTransitionType.rightToLeftWithFade));
+                        }
                       },
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Colors.white10,
-                        hintText: 'Enter the song',
+                        fillColor: const Color(0XFF1e1c22),
+                        hintText: 'Search',
                         prefixIcon: const Icon(
-                          Icons.search,
+                          BootstrapIcons.search,
+                          color: Colors.white,
+                        ),
+                        suffixIcon: IconButton(
+                          splashRadius: 10,
+                          icon: const Icon(Icons.mic, size: 30.0),
+                          onPressed: () {
+                            setState(() {
+                              _isListening = false;
+                            });
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  StatefulBuilder(builder: (context, setState) {
+                                return AlertDialog(
+                                  backgroundColor: const Color(0XFF1e1c22),
+                                  actionsPadding: const EdgeInsets.symmetric(
+                                      vertical: 40.0),
+                                  title: Text('Tap To Speak',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 30.0,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  actionsAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  actions: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: Text(recognizedText,
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                          style:
+                                              const TextStyle(fontSize: 30.0)),
+                                    ),
+                                    Center(
+                                        child: AvatarGlow(
+                                      glowColor: const Color(0XFFC4FC4C),
+                                      endRadius: 80.0,
+                                      animate: _isListening,
+                                      repeat: true,
+                                      child: InkWell(
+                                        overlayColor:
+                                            const MaterialStatePropertyAll(
+                                                Colors.transparent),
+                                        onTap: () async {
+                                          setState((() {
+                                            _isListening = !_isListening;
+                                          }));
+                                          if (_isListening) {
+                                            listenSpeech(setState);
+                                          } else {
+                                            stopSpeech(setState);
+                                          }
+                                        },
+                                        child: CircleAvatar(
+                                          radius: 40.0,
+                                          backgroundColor:
+                                              const Color(0XFFC4FC4C),
+                                          child: Icon(
+                                            _isListening
+                                                ? Icons.mic
+                                                : Icons.mic_none,
+                                            size: 40.0,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ))
+                                  ],
+                                );
+                              }),
+                            );
+                          },
                           color: Colors.white,
                         ),
                         hintStyle: GoogleFonts.poppins(
@@ -87,7 +215,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           fontSize: 18.0,
                         ),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(50.0),
                             borderSide: BorderSide.none),
                       ),
                       enableSuggestions: true,
@@ -104,13 +232,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                 end: Alignment.topLeft,
                                 colors: [
                               //Color(0XFF000000),
-                              Color.fromARGB(223, 109, 2, 6),
-                              Color.fromARGB(223, 5, 15, 86),
+                              // Color.fromARGB(223, 109, 2, 6),
+                              // Color.fromARGB(223, 5, 15, 86),
+                              Color(0XFF1e1c22),
+                              Color(0XFF1e1c22)
                               //Color(0XFF000000),
                             ])),
                         child: ListTile(
-                          leading:
-                              const Icon(Icons.music_note, color: Colors.white),
+                          leading: const Icon(Icons.music_note_outlined,
+                              color: Colors.white),
                           title: Text(
                             itemData,
                             style: GoogleFonts.poppins(
@@ -138,59 +268,59 @@ class _SearchScreenState extends State<SearchScreen> {
                     hideOnEmpty: true,
                   )),
                 ])),
-        bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.black38,
-            elevation: 0,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white,
-            onTap: (value) {
-              switch (value) {
-                case 0:
-                  Navigator.pushReplacement(
-                      context,
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          child: const HomeScreen()));
-                  break;
-                case 1:
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          type: PageTransitionType.leftToRight,
-                          duration: const Duration(milliseconds: 300),
-                          child: const SearchScreen()));
-                  break;
-                case 2:
-                  Navigator.push(
-                      context,
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          duration: const Duration(milliseconds: 300),
-                          child: const AboutScreen()));
-                  break;
-              }
-            },
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.home,
-                  color: Colors.white,
-                ),
-                label: 'home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                label: 'search',
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.info_outline,
-                  ),
-                  label: 'About'),
-            ]),
+        // bottomNavigationBar: BottomNavigationBar(
+        //     backgroundColor: Colors.black38,
+        //     elevation: 0,
+        //     selectedItemColor: Colors.white,
+        //     unselectedItemColor: Colors.white,
+        //     onTap: (value) {
+        //       switch (value) {
+        //         case 0:
+        //           Navigator.pushReplacement(
+        //               context,
+        //               PageTransition(
+        //                   type: PageTransitionType.rightToLeft,
+        //                   child: const HomeScreen()));
+        //           break;
+        //         case 1:
+        //           Navigator.push(
+        //               context,
+        //               PageTransition(
+        //                   type: PageTransitionType.leftToRight,
+        //                   duration: const Duration(milliseconds: 300),
+        //                   child: const SearchScreen()));
+        //           break;
+        //         case 2:
+        //           Navigator.push(
+        //               context,
+        //               PageTransition(
+        //                   type: PageTransitionType.rightToLeft,
+        //                   duration: const Duration(milliseconds: 300),
+        //                   child: const AboutScreen()));
+        //           break;
+        //       }
+        //     },
+        //     items: const [
+        //       BottomNavigationBarItem(
+        //         icon: Icon(
+        //           Icons.home,
+        //           color: Colors.white,
+        //         ),
+        //         label: 'home',
+        //       ),
+        //       BottomNavigationBarItem(
+        //         icon: Icon(
+        //           Icons.search,
+        //           color: Colors.white,
+        //         ),
+        //         label: 'search',
+        //       ),
+        //       BottomNavigationBarItem(
+        //           icon: Icon(
+        //             Icons.info_outline,
+        //           ),
+        //           label: 'About'),
+        //     ]),
       ),
     ));
   }
