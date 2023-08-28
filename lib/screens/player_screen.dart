@@ -10,7 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:http/http.dart' as http;
-import 'package:musico/modals/lyrics.dart';
+import 'package:musico/models/lyrics.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:marquee/marquee.dart';
 
@@ -45,9 +46,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
     super.initState();
     _initializeSongDetails(widget.vd);
     advancedPlayer.playingStream.listen((event) {
-      setState(() {
-        _isPlaying = event;
-      });
+      if (mounted) {
+        setState(() {
+          _isPlaying = event;
+        });
+      }
     });
     advancedPlayer.positionStream.listen((event) {
       setState(() {
@@ -59,7 +62,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
         currentIndex = event ?? 0;
       });
     });
-    advancedPlayer.setVolume(1.0);
     advancedPlayer.playerStateStream.listen((playerState) {
       if (playerState.processingState == ProcessingState.completed) {
         _playNextSong(videoid[currentIndex]);
@@ -125,18 +127,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
     title.add(data[0]["title"]);
     thumbnail.add(data[0]["thumbnail"]);
     videoid.add(data[0]["videoid"]);
-    AudioSource metadata = AudioSource.uri(
-      Uri.parse(data[0]["streamlinks"][0]["url"]),
-      tag: MediaItem(
-        // Specify a unique ID for each media item:
-        id: '${audio.children.length + 1}',
-        // Metadata to display in the notification:
-        album: data[0]["author"],
-        title: data[0]["title"],
-        artUri: Uri.parse(data[0]["thumbnail"]),
-      ),
-    );
     try {
+      AudioSource metadata = AudioSource.uri(
+        Uri.parse(data[0]["streamlinks"][0]["url"]),
+        tag: MediaItem(
+          // Specify a unique ID for each media item:
+          id: '${audio.children.length + 1}',
+          // Metadata to display in the notification:
+          album: data[0]["author"],
+          title: data[0]["title"],
+          artUri: Uri.parse(data[0]["thumbnail"]),
+        ),
+      );
+
       await audio.add(metadata);
     } catch (e) {
       print(e);
@@ -171,7 +174,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     await audio.add(metadata);
     advancedPlayer.seekToNext();
     advancedPlayer.play();
-  }
+  } 
 
   //initial music playback
   Future<void> playMusic() async {
@@ -193,9 +196,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   //play or pause music
   Future<void> _togglePlayback() async {
-    advancedPlayer.playing
-        ? await advancedPlayer.pause()
-        : await advancedPlayer.play();
+    _isPlaying ? await advancedPlayer.pause() : await advancedPlayer.play();
   }
 
   Future<void> _setloop() async {
@@ -291,10 +292,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
             child: ClipRRect(
               child: BackdropFilter(
+                blendMode: BlendMode.src,
                 filter: ImageFilter.blur(
-                    sigmaX: 10.0, sigmaY: 10.0, tileMode: TileMode.clamp),
+                  sigmaX: 20.0,
+                  sigmaY: 20.0,
+                ),
                 child: Scaffold(
-                  backgroundColor: Colors.black54,
+                  backgroundColor: Colors.black38,
                   appBar: AppBar(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
@@ -327,11 +331,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             color: Colors.white),
                         color: const Color(0XFF242424),
                         itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            child: Text(
-                              'sample 1',
-                            ),
-                          ),
+                          PopupMenuItem(
+                              onTap: () {
+                                Share.share(
+                                    'https://music.youtube.com/watch?v=${videoid[currentIndex]}',
+                                    subject: 'Checkout this song');
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.share),
+                                  Spacer(),
+                                  Text('Share')
+                                ],
+                              )),
                           const PopupMenuItem(
                               child: Text(
                             'sample 2',
@@ -571,12 +583,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 ]),
                           ]),
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.05,
+                        height: MediaQuery.of(context).size.height * 0.06,
                       ),
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 15.0),
                         width: double.infinity,
-                        height: MediaQuery.of(context).size.height * 0.4,
+                        height: 330, //MediaQuery.of(context).size.height * 0.4,
                         decoration: const BoxDecoration(
                             shape: BoxShape.rectangle,
                             color: Color(0XFFC4FC4C),
@@ -626,12 +638,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                           style: GoogleFonts.poppins(
                                               fontSize: 21.0,
                                               color: Colors.black,
-                                              fontWeight: FontWeight.w500),
+                                              fontWeight: FontWeight.w600),
                                         );
                                       } catch (e) {
-                                        return const Text(
+                                        return Text(
                                           'No Lyrics Found',
-                                          style: TextStyle(color: Colors.black),
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 21.0,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600),
                                         );
                                       }
                                     },

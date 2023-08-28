@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
@@ -47,6 +48,7 @@ class _SearchScreenState extends State<SearchScreen> {
         }
         if (status == 'done') {
           if (recognizedText.isNotEmpty) {
+            debugPrint(recognizedText);
             Navigator.pop(context);
             Navigator.push(
                 context,
@@ -133,11 +135,15 @@ class _SearchScreenState extends State<SearchScreen> {
                         filled: true,
                         fillColor: const Color(0XFF1e1c22),
                         hintText: 'Search',
-                        prefixIcon: const Icon(
-                          BootstrapIcons.search,
-                          color: Colors.white,
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 5.0),
+                          child: Icon(
+                            BootstrapIcons.search,
+                            color: Colors.white,
+                          ),
                         ),
                         suffixIcon: IconButton(
+                          padding: const EdgeInsets.only(right: 10.0),
                           splashRadius: 10,
                           icon: const Icon(Icons.mic, size: 30.0),
                           onPressed: () {

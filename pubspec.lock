@@ -61,10 +61,10 @@ packages:
     dependency: "direct main"
     description:
       name: audio_video_progress_bar
-      sha256: "67f3a5ea70d48b48caaf29f5a0606284a6aa3a393736daf9e82bec985d2f9b70"
+      sha256: "0bc8b5758288f90d74b0f3562ccdd9dbef5b01a2591175682fed98dcf630634c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "2.0.0"
   avatar_glow:
     dependency: "direct main"
     description:
@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      sha256: "0b0036e8cccbfbe0555fd83c1d31a6f30b77a96b598b35a5d36dd41f718695e9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3+4"
   crypto:
     dependency: transitive
     description:
@@ -223,7 +231,7 @@ packages:
     source: hosted
     version: "0.7.0"
   flutter_cache_manager:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_cache_manager
       sha256: "8207f27539deb83732fdda03e259349046a39a4c767269285f449ade355d54ba"
@@ -472,6 +480,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  mime:
+    dependency: transitive
+    description:
+      name: mime
+      sha256: e4ff8e8564c03f255408decd16e7899da1733852a9110a58fe6d1b817684a63e
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   octo_image:
     dependency: transitive
     description:
@@ -600,6 +616,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.27.7"
+  share_plus:
+    dependency: "direct main"
+    description:
+      name: share_plus
+      sha256: "6cec740fa0943a826951223e76218df002804adb588235a8910dc3d6b0654e11"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.0"
+  share_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: share_plus_platform_interface
+      sha256: "357412af4178d8e11d14f41723f80f12caea54cf0d5cd29af9dcdab85d58aea7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0"
   shimmer:
     dependency: "direct main"
     description:
@@ -817,10 +849,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: f2add6fa510d3ae152903412227bda57d0d5a8da61d2c39c1fb022c9429a41c0
+      sha256: "9e82a402b7f3d518fb9c02d0e9ae45952df31b9bf34d77baf19da2de03fc2aaa"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.6"
+    version: "5.0.7"
   xdg_directories:
     dependency: transitive
     description:

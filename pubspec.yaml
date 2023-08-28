@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   audio_service: ^0.18.10
-  audio_video_progress_bar: ^1.0.1
+  audio_video_progress_bar: ^2.0.0
   avatar_glow: ^2.0.2
   bootstrap_icons: ^1.10.5+2
   cached_network_image: ^3.2.3
@@ -38,7 +38,6 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   flutter:
     sdk: flutter
-  flutter_cache_manager: ^3.3.1
   flutter_native_splash: ^2.3.1
   flutter_typeahead: ^4.6.2
   font_awesome_flutter: ^10.5.0
@@ -51,6 +50,7 @@ dependencies:
   marquee: ^2.2.3
   material_design_icons_flutter: ^7.0.7296
   page_transition: ^2.0.9
+  share_plus: ^7.1.0
   shimmer: ^3.0.0
   speech_to_text: ^6.3.0
   url_launcher: ^6.1.12

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:musico/modals/playlist_songs.dart';
+import 'package:musico/models/playlist_songs.dart';
 import 'package:http/http.dart' as http;
 import 'package:musico/screens/player_screen.dart';
 import 'package:musico/shimmers/playlist_shimmer.dart';
