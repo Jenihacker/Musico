@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:musico/screens/search_results.dart';
+import 'package:musico/services/api/search_suggestions_api.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -48,7 +47,6 @@ class _SearchScreenState extends State<SearchScreen> {
         }
         if (status == 'done') {
           if (recognizedText.isNotEmpty) {
-            debugPrint(recognizedText);
             Navigator.pop(context);
             Navigator.push(
                 context,
@@ -97,6 +95,7 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.black,
+          toolbarHeight: 40,
         ),
         backgroundColor: Colors.black12,
         body: Padding(
@@ -106,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 50.0,
+                    height: 65.0,
                     child: Text('Search',
                         style: GoogleFonts.poppins(
                           fontSize: 32.0,
@@ -227,7 +226,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       enableSuggestions: true,
                     ),
                     suggestionsCallback: (pattern) async {
-                      return await getsuggestion(pattern);
+                      return await SearchSuggestionApi()
+                              .getSuggestion(pattern) ??
+                          [];
                       //return ['Song not found'];
                     },
                     itemBuilder: (context, itemData) {
@@ -276,15 +277,5 @@ class _SearchScreenState extends State<SearchScreen> {
                 ])),
       ),
     ));
-  }
-
-  Future<List<dynamic>> getsuggestion(String pattern) async {
-    final response = await http.get(Uri.parse(
-        'https://ytmusic-tau.vercel.app/search_suggestion?query=$pattern'));
-    var data = jsonDecode(response.body.toString());
-    if (response.statusCode == 200) {
-      return data['suggestions'];
-    }
-    return [];
   }
 }

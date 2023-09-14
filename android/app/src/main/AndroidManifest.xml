@@ -27,7 +27,7 @@
     <application
         android:label="Musico"
         android:name="${applicationName}"
-        android:icon="@mipmap/musico"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         
         <activity

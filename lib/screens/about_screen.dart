@@ -26,15 +26,12 @@ class AboutScreen extends StatelessWidget {
             ),
             const Center(
               child: CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 130,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 20.0),
-                  child: Image(
-                    image: AssetImage('assets/images/playstore.png'),
-                    width: 200,
-                    height: 200,
-                  ),
+                backgroundColor: Color(0XFF1A1A1A),
+                radius: 120,
+                child: Image(
+                  image:
+                      AssetImage('assets/images/ic_launcher_adaptive_fore.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),

@@ -36,6 +36,7 @@ dependencies:
   convert: ^3.1.1
   cupertino_icons: ^1.0.2
   curved_navigation_bar: ^1.0.3
+  dio: ^5.3.2
   flutter:
     sdk: flutter
   flutter_native_splash: ^2.3.1
@@ -56,9 +57,23 @@ dependencies:
   url_launcher: ^6.1.12
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^2.0.2
   flutter_test:
     sdk: flutter
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/ic_launcher.png"
+  adaptive_icon_background: "assets/images/ic_launcher_adaptive_back.png"
+  adaptive_icon_foreground: "assets/images/ic_launcher_adaptive_fore.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/ic_launcher.png"
+    background_color: "#1A1A1A"
+    theme_color: "#1A1A1A"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

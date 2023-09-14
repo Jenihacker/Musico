@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:musico/services/api/search_song_api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:musico/models/search_output.dart';
 import 'package:musico/screens/player_screen.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:musico/shimmers/searchresult_shimmer.dart';
@@ -17,8 +17,6 @@ class SearchResultScreen extends StatefulWidget {
 }
 
 class _SearchResultScreenState extends State<SearchResultScreen> {
-  late Songs songs;
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -61,15 +59,25 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   icon: const Icon(Icons.arrow_back_ios_new),
                 ),
                 actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
-                    child: Text(
-                      "Songs",
-                      style: GoogleFonts.poppins(
-                        fontSize: 35,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10.0),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.75,
+                          child: Text(
+                            widget.message,
+                            style: GoogleFonts.poppins(
+                              fontSize: 25,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -88,7 +96,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               body: TabBarView(
                 children: [
                   FutureBuilder(
-                    future: getData(widget.message, "songs"),
+                    future: SearchSongs().getSongs(widget.message),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return ListView.builder(
@@ -120,12 +128,11 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                   children: [
                                     const Icon(
                                       Icons.play_circle_sharp,
-                                      size: 30,
+                                      size: 27,
                                       color: Colors.white,
                                     ),
                                     Text(
-                                      snapshot.data![index]["duration"] ??
-                                          '0:00',
+                                      snapshot.data![index]?.duration ?? '0:00',
                                       style: GoogleFonts.poppins(
                                           color: Colors.white70),
                                       overflow: TextOverflow.ellipsis,
@@ -134,21 +141,19 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                 ),
                                 enabled: true,
                                 leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5.0),
+                                  borderRadius: BorderRadius.circular(3.0),
                                   child: Image.network(
-                                    snapshot.data![index]["thumbnails"]
+                                    snapshot.data![index]!.thumbnails
                                             .contains("=w120")
-                                        ? snapshot.data![index]["thumbnails"]
-                                                .split("=w120")[0] +
-                                            "=w240-h240-l90-rj"
-                                        : snapshot.data![index]["thumbnails"],
+                                        ? "${snapshot.data![index]!.thumbnails.split("=w120")[0]}=w240-h240-l90-rj"
+                                        : snapshot.data![index]!.thumbnails,
                                     width: 100,
                                     height: 100,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                                 title: Text(
-                                  snapshot.data![index]["title"],
+                                  snapshot.data![index]!.title,
                                   style: GoogleFonts.nunito(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -156,7 +161,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 subtitle: Text(
-                                  snapshot.data![index]["artists"],
+                                  snapshot.data![index]!.artists,
                                   style: GoogleFonts.poppins(
                                       color: Colors.white70),
                                   overflow: TextOverflow.ellipsis,
@@ -166,8 +171,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                       context,
                                       PageTransition(
                                           child: PlayerScreen(
-                                              vd: snapshot.data![index]
-                                                  ["videoId"]),
+                                              vd: snapshot
+                                                  .data![index]!.videoId),
                                           type: PageTransitionType.bottomToTop,
                                           duration: const Duration(
                                               milliseconds: 300)));
@@ -187,7 +192,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     },
                   ),
                   FutureBuilder(
-                    future: getData(widget.message, "videos"),
+                    future: SearchSongs().getVideos(widget.message),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return ListView.builder(
@@ -219,12 +224,11 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                   children: [
                                     const Icon(
                                       Icons.play_circle_sharp,
-                                      size: 30,
+                                      size: 27,
                                       color: Colors.white,
                                     ),
                                     Text(
-                                      snapshot.data![index]["duration"] ??
-                                          '0:00',
+                                      snapshot.data![index]!.duration,
                                       style: GoogleFonts.poppins(
                                           color: Colors.white70),
                                       overflow: TextOverflow.ellipsis,
@@ -237,18 +241,18 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(5.0),
                                   child: Image.network(
-                                    snapshot.data![index]["thumbnails"]
+                                    snapshot.data![index]!.thumbnails
                                             .contains("?sqp=")
-                                        ? snapshot.data![index]["thumbnails"]
+                                        ? snapshot.data![index]!.thumbnails
                                             .split("?sqp=")[0]
-                                        : snapshot.data![index]["thumbnails"],
+                                        : snapshot.data![index]!.thumbnails,
                                     width: 100,
                                     height: 100,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                                 title: Text(
-                                  snapshot.data![index]["title"],
+                                  snapshot.data![index]!.title,
                                   style: GoogleFonts.nunito(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -256,7 +260,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 subtitle: Text(
-                                  snapshot.data![index]["artists"],
+                                  snapshot.data![index]!.artists,
                                   style: GoogleFonts.poppins(
                                       color: Colors.white70),
                                   overflow: TextOverflow.ellipsis,
@@ -266,8 +270,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                       context,
                                       PageTransition(
                                           child: PlayerScreen(
-                                              vd: snapshot.data![index]
-                                                  ["videoId"]),
+                                              vd: snapshot
+                                                  .data![index]!.videoId),
                                           type: PageTransitionType.bottomToTop,
                                           duration: const Duration(
                                               milliseconds: 300)));

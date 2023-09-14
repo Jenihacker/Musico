@@ -66,11 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         type: PageTransitionType.rightToLeft)),
                 child: const CircleAvatar(
                   radius: 25,
-                  backgroundColor: Colors.white70,
+                  backgroundColor: Color(0XFF1A1A1A),
                   child: Image(
-                    image: AssetImage('assets/images/playstore.png'),
-                    width: 40,
-                    height: 40,
+                    image: AssetImage(
+                        'assets/images/ic_launcher_adaptive_fore.png'),
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

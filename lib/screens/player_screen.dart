@@ -10,7 +10,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:http/http.dart' as http;
-import 'package:musico/models/lyrics.dart';
+import 'package:musico/services/api/lyrics_api.dart';
+import 'package:musico/models/response/player_res.dart';
+import 'package:musico/services/api/player_api.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:marquee/marquee.dart';
@@ -38,13 +40,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
   List<String> thumbnail = [""];
   List<String> streamlink = [""];
   List<String> videoid = [""];
-  late Lyrics lyrics;
+  String lyrics = "";
   late ConcatenatingAudioSource audio;
 
   @override
   void initState() {
     super.initState();
+    getSongLyrics(widget.vd);
     _initializeSongDetails(widget.vd);
+    advancedPlayer.playbackEventStream.listen((event) {
+      if (event.processingState == ProcessingState.buffering) {
+        getSongLyrics(videoid[currentIndex]);
+      }
+    });
     advancedPlayer.playingStream.listen((event) {
       if (mounted) {
         setState(() {
@@ -70,14 +78,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   void _initializeSongDetails(String song) async {
-    final response = await http
-        .get(Uri.parse("https://ytmusic-tau.vercel.app/songdetails/$song"));
-    var data = jsonDecode(response.body.toString());
-    title[0] = data[0]["title"];
-    author[0] = data[0]["author"];
-    thumbnail[0] = data[0]["thumbnail"];
-    streamlink[0] = data[0]["streamlinks"][0]["url"];
-    videoid[0] = data[0]["videoid"];
+    // final response = await http
+    //     .get(Uri.parse("https://ytmusic-tau.vercel.app/songdetails/$song"));
+    // var data = jsonDecode(response.body.toString());
+    SongDetailsRes? songinfo = await Player().getSongDetails(song);
+    title[0] = songinfo!.title;
+    author[0] = songinfo.author;
+    thumbnail[0] = songinfo.thumbnail;
+    streamlink[0] = songinfo.streamlink;
+    videoid[0] = songinfo.title;
     playMusic();
     final response1 = await http
         .get(Uri.parse("https://ytmusic-tau.vercel.app/playerplaylist/$song"));
@@ -111,70 +120,74 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Future<void> _playPrevSong() async {
     if (advancedPlayer.hasPrevious) {
-      //await advancedPlayer.pause();
       await advancedPlayer.seekToPrevious();
-      //await advancedPlayer.play();
     } else {
       advancedPlayer.seek(Duration.zero);
     }
   }
 
   Future<void> _addNewSong(String vid) async {
-    final response = await http
-        .get(Uri.parse("https://ytmusic-tau.vercel.app/songdetails/$vid"));
-    var data = jsonDecode(response.body.toString());
-    author.add(data[0]["author"]);
-    title.add(data[0]["title"]);
-    thumbnail.add(data[0]["thumbnail"]);
-    videoid.add(data[0]["videoid"]);
+    // final response = await http
+    //     .get(Uri.parse("https://ytmusic-tau.vercel.app/songdetails/$vid"));
+    // var data = jsonDecode(response.body.toString());
+    SongDetailsRes? songinfo = await Player().getSongDetails(vid);
+    author.add(songinfo!.author);
+    title.add(songinfo.title);
+    thumbnail.add(songinfo.thumbnail);
+    videoid.add(songinfo.videoid);
     try {
       AudioSource metadata = AudioSource.uri(
-        Uri.parse(data[0]["streamlinks"][0]["url"]),
+        Uri.parse(songinfo.streamlink),
         tag: MediaItem(
           // Specify a unique ID for each media item:
-          id: '${audio.children.length + 1}',
+          id: '${audio.children.length}',
           // Metadata to display in the notification:
-          album: data[0]["author"],
-          title: data[0]["title"],
-          artUri: Uri.parse(data[0]["thumbnail"]),
+          album: songinfo.author,
+          artist: songinfo.author,
+          title: songinfo.title,
+          artUri: Uri.parse(songinfo.thumbnail),
         ),
       );
-
       await audio.add(metadata);
-    } catch (e) {
-      print(e);
+    } catch (e, stacktrace) {
+      print('$e $stacktrace');
     }
   }
 
   //play next song
   Future<void> _playNextSong(String vid) async {
-    final response =
-        await http.get(Uri.parse("https://ytmusic-tau.vercel.app/next/$vid"));
-    var data = jsonDecode(response.body.toString());
-    if (vid == data[0]["videoid"]) {
-      _playNextSong(vid);
-    }
-    author.add(data[0]["author"]);
-    title.add(data[0]["title"]);
-    thumbnail.add(data[0]["thumbnail"]);
-    setState(() {
+    if (advancedPlayer.hasNext) {
+      await advancedPlayer.seekToNext();
+    } else {
+      final response =
+          await http.get(Uri.parse("https://ytmusic-tau.vercel.app/next/$vid"));
+      var data = jsonDecode(response.body.toString());
+      if (vid == data[0]["videoid"]) {
+        _playNextSong(vid);
+      }
+      author.add(data[0]["author"]);
+      title.add(data[0]["title"]);
+      thumbnail.add(data[0]["thumbnail"]);
+
       videoid.add(data[0]["videoid"]);
-    });
-    AudioSource metadata = AudioSource.uri(
-      Uri.parse(data[0]["streamlinks"][0]["url"]),
-      tag: MediaItem(
-        // Specify a unique ID for each media item:
-        id: '${audio.children.length + 1}',
-        // Metadata to display in the notification:
-        album: data[0]["author"],
-        title: data[0]["title"],
-        artUri: Uri.parse(data[0]["thumbnail"]),
-      ),
-    );
-    await audio.add(metadata);
-    advancedPlayer.seekToNext();
-    advancedPlayer.play();
-  } 
+
+      AudioSource metadata = AudioSource.uri(
+        Uri.parse(data[0]["streamlinks"][0]["url"]),
+        tag: MediaItem(
+          // Specify a unique ID for each media item:
+          id: '${audio.children.length}',
+          // Metadata to display in the notification:
+          album: data[0]["author"],
+          artist: data[0]["author"],
+          title: data[0]["title"],
+          artUri: Uri.parse(data[0]["thumbnail"]),
+        ),
+      );
+      await audio.add(metadata);
+      advancedPlayer.seekToNext();
+      advancedPlayer.play();
+    }
+  }
 
   //initial music playback
   Future<void> playMusic() async {
@@ -182,15 +195,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
       Uri.parse(streamlink[0]),
       tag: MediaItem(
         // Specify a unique ID for each media item:
-        id: '${1}',
+        id: '${0}',
         // Metadata to display in the notification:
         album: author[0],
+        artist: author[0],
         title: title[0],
         artUri: Uri.parse(thumbnail[0]),
       ),
     );
-    audio = ConcatenatingAudioSource(children: [metadata]);
-    advancedPlayer.setAudioSource(audio);
+    audio = ConcatenatingAudioSource(children: []);
+    await audio.add(metadata);
+    await advancedPlayer.setAudioSource(audio);
     advancedPlayer.play();
   }
 
@@ -344,14 +359,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   Text('Share')
                                 ],
                               )),
-                          const PopupMenuItem(
-                              child: Text(
-                            'sample 2',
-                          )),
-                          const PopupMenuItem(
-                              child: Text(
-                            'sample 3',
-                          ))
+                          // const PopupMenuItem(
+                          //     child: Text(
+                          //   'sample 2',
+                          // )),
+                          // const PopupMenuItem(
+                          //     child: Text(
+                          //   'sample 3',
+                          // ))
                         ],
                       )
                     ],
@@ -617,39 +632,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     MediaQuery.of(context).size.height * 0.018,
                               ),
                               SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.325,
+                                height: 265,
                                 child: SingleChildScrollView(
-                                  child: FutureBuilder(
-                                    future: getLyrics(videoid[currentIndex]),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        return Text(
-                                          lyrics.lyrics,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 21.0,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600),
-                                        );
-                                      }
-                                      try {
-                                        return Text(
-                                          lyrics.lyrics,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 21.0,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600),
-                                        );
-                                      } catch (e) {
-                                        return Text(
-                                          'No Lyrics Found',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 21.0,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600),
-                                        );
-                                      }
-                                    },
+                                  child: Text(
+                                    lyrics,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 21.0,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ),
@@ -671,13 +661,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  Future<Lyrics> getLyrics(String vid) async {
-    final response =
-        await http.get(Uri.parse("https://ytmusic-tau.vercel.app/lyrics/$vid"));
-    var data = jsonDecode(response.body.toString());
-    lyrics = Lyrics.fromJson(data);
-    if (response.statusCode == 200) {
-      return lyrics;
+  Future<String> getSongLyrics(String vid) async {
+    lyrics = await Lyrics().getLyrics(vid);
+    if (mounted) {
+      setState(() {
+        lyrics = lyrics;
+      });
     }
     return lyrics;
   }
