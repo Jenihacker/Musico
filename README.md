@@ -1,17 +1,40 @@
-# Musico
+<h1 align="center">
+    Musico
+</h1>
 
-A new Flutter project.
+<div align="center">
+  <img src="./assets/images/ic_launcher.png">
+</div>
 
-## Getting Started
+The YouTube Music Player Application is a versatile and user-friendly music streaming platform that leverages the YouTube Music API to provide users with access to a vast library of songs and playlists. This application allows users to search for their favorite songs, discover new music, and access a large number of playlists.
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## Installation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Install project dependencies 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-"Musico" 
+```bash
+  flutter pub get
+```
+
+Run project using this command
+
+```bash
+  flutter run -d <device name>
+```
+
+Build the project using this command
+
+```bash
+  flutter build apk --no-tree-shake-icons
+```
+
+To install the apk
+
+```bash
+  flutter install -d <device name>
+```
+
+
+
+    

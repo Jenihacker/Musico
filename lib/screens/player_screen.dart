@@ -48,11 +48,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     super.initState();
     getSongLyrics(widget.vd);
     _initializeSongDetails(widget.vd);
-    advancedPlayer.playbackEventStream.listen((event) {
-      if (event.processingState == ProcessingState.buffering) {
-        getSongLyrics(videoid[currentIndex]);
-      }
-    });
     advancedPlayer.playingStream.listen((event) {
       if (mounted) {
         setState(() {
@@ -60,6 +55,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         });
       }
     });
+    advancedPlayer.automaticallyWaitsToMinimizeStalling;
     advancedPlayer.positionStream.listen((event) {
       setState(() {
         _currentslidervalue = event;
@@ -69,6 +65,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       setState(() {
         currentIndex = event ?? 0;
       });
+      getSongLyrics(videoid[currentIndex]);
     });
     advancedPlayer.playerStateStream.listen((playerState) {
       if (playerState.processingState == ProcessingState.completed) {
@@ -86,7 +83,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     author[0] = songinfo.author;
     thumbnail[0] = songinfo.thumbnail;
     streamlink[0] = songinfo.streamlink;
-    videoid[0] = songinfo.title;
+    videoid[0] = songinfo.videoid;
     playMusic();
     final response1 = await http
         .get(Uri.parse("https://ytmusic-tau.vercel.app/playerplaylist/$song"));
