@@ -6,7 +6,7 @@
   <img src="./assets/images/ic_launcher.png">
 </div>
 
-The YouTube Music Player Application is a versatile and user-friendly music streaming platform that leverages the YouTube Music API to provide users with access to a vast library of songs and playlists. This application allows users to search for their favorite songs, discover new music, and access a large number of playlists.
+Musico is a versatile and user-friendly music streaming platform that leverages the YouTube Music API to provide users with access to a vast library of songs and playlists. This application allows users to search for their favorite songs, discover new music, and access a large number of playlists.
 
 
 ## Installation
@@ -20,7 +20,7 @@ Install project dependencies
 Run project using this command
 
 ```bash
-  flutter run -d <device name>
+  flutter run -d device_name
 ```
 
 Build the project using this command
@@ -32,7 +32,7 @@ Build the project using this command
 To install the apk
 
 ```bash
-  flutter install -d <device name>
+  flutter install -d device_name
 ```
 
 
