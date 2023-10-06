@@ -39,7 +39,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Start release build
-        run: flutter build apk --release --split-per-abi --no-tree-shake-icons
+        run: flutter build apk --no-tree-shake-icons
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
