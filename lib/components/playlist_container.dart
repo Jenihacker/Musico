@@ -16,11 +16,19 @@ class PlaylistContainer extends StatefulWidget {
 
 class _PlaylistContainerState extends State<PlaylistContainer> {
   final List<PlaylistCategory> playlistcat = [];
+  Future? getplist;
+  
+
+  @override
+  void initState() {
+    super.initState();
+    getplist = getPlaylist(widget.title);
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: getPlaylist(widget.title),
+      future: getplist,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {

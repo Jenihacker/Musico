@@ -2,7 +2,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:musico/screens/about_screen.dart';
 import 'package:musico/screens/home_screen.dart';
+import 'package:musico/screens/player_screen.dart';
 import 'package:musico/screens/search_screen.dart';
+import 'package:musico/services/Providers/music_player_provider.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
@@ -31,11 +36,68 @@ class _BaseScreenState extends State<BaseScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      body: mainbody(),
+          resizeToAvoidBottomInset: false,
+      body: Stack(children: [
+        mainbody(),
+        Consumer<MusicPlayerProvider>(builder: (_, musicPlayerProvider, child) {
+          return Positioned(
+              bottom: 65,
+              child: Visibility(
+                visible: musicPlayerProvider.audio == null ? false : true,
+                child: InkWell(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(color: Color(0XFFC4FC4C)),
+                      
+                      width: MediaQuery.of(context).size.width,
+                      child: ListTile(
+                        
+                        title: Text(
+                          musicPlayerProvider
+                              .title[musicPlayerProvider.currentIndex],
+                          maxLines: 1,
+                          style: GoogleFonts.poppins(color: Colors.black,fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          musicPlayerProvider
+                              .author[musicPlayerProvider.currentIndex],
+                          maxLines: 1,
+                          style: GoogleFonts.poppins(color: Colors.black,fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        leading: Image(
+                            image: NetworkImage(musicPlayerProvider
+                                .thumbnail[musicPlayerProvider.currentIndex])),
+                        trailing: IconButton(
+                          iconSize: 40,
+                          icon: musicPlayerProvider.isPlaying
+                              ? const Icon(Icons.pause,size: 40,color: Colors.black,)
+                              : const Icon(Icons.play_arrow, size: 40,color: Colors.black,),
+                          onPressed: () {
+                            musicPlayerProvider.togglePlayback();
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            child: const PlayerScreen(),
+                            type: PageTransitionType.bottomToTop));
+                  },
+                ),
+              ));
+        })
+      ]),
       backgroundColor: Colors.transparent,
       extendBody: true,
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
+        margin: const EdgeInsets.only(left: 15, right: 15,),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50.0),
             color: Colors.transparent),
