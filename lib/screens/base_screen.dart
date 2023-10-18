@@ -36,7 +36,7 @@ class _BaseScreenState extends State<BaseScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: Stack(children: [
         mainbody(),
         Consumer<MusicPlayerProvider>(builder: (_, musicPlayerProvider, child) {
@@ -44,52 +44,89 @@ class _BaseScreenState extends State<BaseScreen> {
               bottom: 65,
               child: Visibility(
                 visible: musicPlayerProvider.audio == null ? false : true,
-                child: InkWell(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(color: Color(0XFFC4FC4C)),
-                      
-                      width: MediaQuery.of(context).size.width,
+                child: Container(
+                  alignment: Alignment.center,
+                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                  decoration: BoxDecoration(
+                      color: const Color(0XFFC4FC4C),
+                      borderRadius: BorderRadius.circular(10.0)),
+                  width: MediaQuery.of(context).size.width * 0.95,
+                  child: InkWell(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.0),
                       child: ListTile(
-                        
                         title: Text(
                           musicPlayerProvider
                               .title[musicPlayerProvider.currentIndex],
                           maxLines: 1,
-                          style: GoogleFonts.poppins(color: Colors.black,fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(
+                              color: Colors.black, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
                           musicPlayerProvider
                               .author[musicPlayerProvider.currentIndex],
                           maxLines: 1,
-                          style: GoogleFonts.poppins(color: Colors.black,fontWeight: FontWeight.w500),
+                          style: GoogleFonts.poppins(
+                              color: Colors.black, fontWeight: FontWeight.w500),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        leading: Image(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Image(
                             image: NetworkImage(musicPlayerProvider
-                                .thumbnail[musicPlayerProvider.currentIndex])),
-                        trailing: IconButton(
-                          iconSize: 40,
-                          icon: musicPlayerProvider.isPlaying
-                              ? const Icon(Icons.pause,size: 40,color: Colors.black,)
-                              : const Icon(Icons.play_arrow, size: 40,color: Colors.black,),
-                          onPressed: () {
-                            musicPlayerProvider.togglePlayback();
-                          },
+                                .thumbnail[musicPlayerProvider.currentIndex]),
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              iconSize: 35,
+                              icon: musicPlayerProvider.isPlaying
+                                  ? const Icon(
+                                      Icons.pause,
+                                      size: 35,
+                                      color: Colors.black,
+                                    )
+                                  : const Icon(
+                                      Icons.play_arrow,
+                                      size: 35,
+                                      color: Colors.black,
+                                    ),
+                              onPressed: () {
+                                musicPlayerProvider.togglePlayback();
+                              },
+                            ),
+                            Visibility(
+                              visible:
+                                  musicPlayerProvider.advancedPlayer.hasNext
+                                      ? true
+                                      : false,
+                              child: IconButton(
+                                iconSize: 35,
+                                icon: const Icon(
+                                  Icons.skip_next,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () {
+                                  musicPlayerProvider.togglePlayback();
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              child: const PlayerScreen(),
+                              type: PageTransitionType.bottomToTop));
+                    },
                   ),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                            child: const PlayerScreen(),
-                            type: PageTransitionType.bottomToTop));
-                  },
                 ),
               ));
         })
@@ -97,12 +134,10 @@ class _BaseScreenState extends State<BaseScreen> {
       backgroundColor: Colors.transparent,
       extendBody: true,
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(left: 15, right: 15,),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50.0),
             color: Colors.transparent),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(50.0),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: NavigationBar(
