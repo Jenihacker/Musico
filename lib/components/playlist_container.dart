@@ -17,7 +17,6 @@ class PlaylistContainer extends StatefulWidget {
 class _PlaylistContainerState extends State<PlaylistContainer> {
   final List<PlaylistCategory> playlistcat = [];
   Future? getplist;
-  
 
   @override
   void initState() {
@@ -51,7 +50,7 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
                   itemBuilder: (context, index) {
                     return SongCard(
                         playlistname: playlistcat[index].title,
-                        playlistdesc: playlistcat[index].description,
+                        playlistdesc: Description.PLAYLIST_YOU_TUBE_MUSIC,
                         thumbnail: playlistcat[index].thumbnails[1].url,
                         playlistid: playlistcat[index].playlistId);
                   },

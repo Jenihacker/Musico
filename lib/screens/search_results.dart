@@ -335,74 +335,82 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                               child: InkWell(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12.0),
-                                  child: ListTile(
-                                    title: Text(
-                                      musicPlayerProvider.title[
-                                          musicPlayerProvider.currentIndex],
-                                      maxLines: 1,
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    subtitle: Text(
-                                      musicPlayerProvider.author[
-                                          musicPlayerProvider.currentIndex],
-                                      maxLines: 1,
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    leading: ClipRRect(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      child: Image(
-                                        image: NetworkImage(musicPlayerProvider
-                                                .thumbnail[
-                                            musicPlayerProvider.currentIndex]),
-                                      ),
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        IconButton(
-                                          iconSize: 35,
-                                          icon: musicPlayerProvider.isPlaying
-                                              ? const Icon(
-                                                  Icons.pause,
-                                                  size: 35,
-                                                  color: Colors.black,
-                                                )
-                                              : const Icon(
-                                                  Icons.play_arrow,
-                                                  size: 35,
-                                                  color: Colors.black,
-                                                ),
-                                          onPressed: () {
-                                            musicPlayerProvider
-                                                .togglePlayback();
-                                          },
-                                        ),
-                                        Visibility(
-                                          visible: musicPlayerProvider
-                                                  .advancedPlayer.hasNext
-                                              ? true
-                                              : false,
-                                          child: IconButton(
-                                            iconSize: 35,
-                                            icon: const Icon(
-                                              Icons.skip_next,
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(
+                                          musicPlayerProvider.title[
+                                              musicPlayerProvider.currentIndex],
+                                          maxLines: 1,
+                                          style: GoogleFonts.poppins(
                                               color: Colors.black,
-                                            ),
-                                            onPressed: () {
-                                              musicPlayerProvider
-                                                  .playNextSong();
-                                            },
+                                              fontWeight: FontWeight.w600),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          musicPlayerProvider.author[
+                                              musicPlayerProvider.currentIndex],
+                                          maxLines: 1,
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w500),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        leading: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
+                                          child: Image(
+                                            image: NetworkImage(
+                                                musicPlayerProvider.thumbnail[
+                                                    musicPlayerProvider
+                                                        .currentIndex]),
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            IconButton(
+                                              iconSize: 35,
+                                              icon:
+                                                  musicPlayerProvider.isPlaying
+                                                      ? const Icon(
+                                                          Icons.pause,
+                                                          size: 35,
+                                                          color: Colors.black,
+                                                        )
+                                                      : const Icon(
+                                                          Icons.play_arrow,
+                                                          size: 35,
+                                                          color: Colors.black,
+                                                        ),
+                                              onPressed: () {
+                                                musicPlayerProvider
+                                                    .togglePlayback();
+                                              },
+                                            ),
+                                            Visibility(
+                                              visible: musicPlayerProvider
+                                                      .advancedPlayer.hasNext
+                                                  ? true
+                                                  : false,
+                                              child: IconButton(
+                                                iconSize: 35,
+                                                icon: const Icon(
+                                                  Icons.skip_next,
+                                                  color: Colors.black,
+                                                ),
+                                                onPressed: () {
+                                                  musicPlayerProvider
+                                                      .playNextSong();
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 onTap: () {

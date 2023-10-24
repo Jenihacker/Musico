@@ -27,11 +27,9 @@ class MusicPlayerProvider extends ChangeNotifier {
   ConcatenatingAudioSource? audio;
 
   void initializeSongDetails(String song) async {
-    advancedPlayer.stop();
+    currentIndex = 0;
     audio = ConcatenatingAudioSource(children: []);
-    if (audio != null) {
-      await audio?.clear();
-    }
+    await audio?.clear();
     title = [""];
     author = [""];
     thumbnail = [""];
@@ -58,7 +56,7 @@ class MusicPlayerProvider extends ChangeNotifier {
     thumbnail[0] = songinfo.thumbnail;
     streamlink[0] = songinfo.streamlink;
     videoid[0] = songinfo.videoid;
-    playMusic();
+    await playMusic();
     final response1 = await http
         .get(Uri.parse("https://ytmusic-tau.vercel.app/playerplaylist/$song"));
     var data1 = jsonDecode(response1.body.toString());
@@ -107,13 +105,9 @@ class MusicPlayerProvider extends ChangeNotifier {
 
   Future<void> _addNewSong(String vid) async {
     SongDetailsRes? songinfo = await Player().getSongDetails(vid);
-    author.add(songinfo!.author);
-    title.add(songinfo.title);
-    thumbnail.add(songinfo.thumbnail);
-    videoid.add(songinfo.videoid);
     try {
       AudioSource metadata = AudioSource.uri(
-        Uri.parse(songinfo.streamlink),
+        Uri.parse(songinfo!.streamlink),
         tag: MediaItem(
           // Specify a unique ID for each media item:
           id: '${audio!.children.length}',
@@ -125,6 +119,11 @@ class MusicPlayerProvider extends ChangeNotifier {
         ),
       );
       await audio!.add(metadata);
+      author.add(songinfo.author);
+      title.add(songinfo.title);
+      thumbnail.add(songinfo.thumbnail);
+      videoid.add(songinfo.videoid);
+      print(audio!.children.first.toString());
     } catch (e, stacktrace) {
       print('$e $stacktrace');
     }

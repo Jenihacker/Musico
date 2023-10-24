@@ -111,7 +111,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                   color: Colors.black,
                                 ),
                                 onPressed: () {
-                                  musicPlayerProvider.togglePlayback();
+                                  musicPlayerProvider.playNextSong();
                                 },
                               ),
                             ),
