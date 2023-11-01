@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:musico/components/playlist_container.dart';
 import 'package:musico/screens/about_screen.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,13 +15,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var settext = "";
+  late final SharedPreferences pref;
+  String username = "";
+  String? avatar;
+
+  void getsharedpref() async {
+    pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString('username') ?? "";
+      avatar = pref.getString('avatar');
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getsharedpref();
     var time = DateTime.now().hour;
     if (time >= 0 && time < 12) {
-      settext = "Good Morning";
+      settext = "Good morning";
     } else if (time >= 12 && time < 17) {
       settext = "Good Afternoon";
     } else if (time >= 17 && time < 21) {
@@ -50,9 +63,11 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.black,
           toolbarHeight: 65.0,
           title: Text(
-            settext,
+            "$settext ${username!}",
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
-              fontSize: 25.0,
+              fontSize: 22.0,
+              fontWeight: FontWeight.w600,
             ),
           ),
           actions: [
@@ -64,16 +79,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     PageTransition(
                         child: const AboutScreen(),
                         type: PageTransitionType.rightToLeft)),
-                child: const CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Color(0XFF1A1A1A),
-                  child: Image(
-                    image: AssetImage(
-                        'assets/images/ic_launcher_adaptive_fore.png'),
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: const Color(0XFF1A1A1A),
+                  backgroundImage: AssetImage(
+                      avatar ?? 'assets/images/ic_launcher_adaptive_fore.png'),
                 ),
               ),
             )

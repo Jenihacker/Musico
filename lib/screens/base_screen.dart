@@ -145,9 +145,11 @@ class _BaseScreenState extends State<BaseScreen> {
                 backgroundColor: Colors.white38,
                 selectedIndex: currentIndex,
                 onDestinationSelected: (value) {
-                  setState(() {
-                    currentIndex = value;
-                  });
+                  if (currentIndex != value) {
+                    setState(() {
+                      currentIndex = value;
+                    });
+                  }
                 },
                 indicatorColor: const Color(0XFFC4FC4C),
                 labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
