@@ -43,7 +43,10 @@ class _BaseScreenState extends State<BaseScreen> {
           return Positioned(
               bottom: 65,
               child: Visibility(
-                visible: musicPlayerProvider.audio == null ? false : true,
+                visible: musicPlayerProvider.audio == null ||
+                        musicPlayerProvider.songs == []
+                    ? false
+                    : true,
                 child: Container(
                   alignment: Alignment.center,
                   margin: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -51,21 +54,31 @@ class _BaseScreenState extends State<BaseScreen> {
                       color: const Color(0XFFC4FC4C),
                       borderRadius: BorderRadius.circular(10.0)),
                   width: MediaQuery.of(context).size.width * 0.95,
-                  child: InkWell(
+                  child: GestureDetector(
+                     onVerticalDragEnd: (details) async {
+                      await musicPlayerProvider.advancedPlayer.stop();
+                      musicPlayerProvider.audio = null;
+                      musicPlayerProvider.isNewSongSet = true;
+                    },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
                       child: ListTile(
                         title: Text(
-                          musicPlayerProvider
-                              .title[musicPlayerProvider.currentIndex],
+                          musicPlayerProvider.songs.isNotEmpty
+                              ? musicPlayerProvider
+                                  .songs[musicPlayerProvider.currentIndex].title
+                              : "",
                           maxLines: 1,
                           style: GoogleFonts.poppins(
                               color: Colors.black, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
-                          musicPlayerProvider
-                              .author[musicPlayerProvider.currentIndex],
+                          musicPlayerProvider.songs.isNotEmpty
+                              ? musicPlayerProvider
+                                  .songs[musicPlayerProvider.currentIndex]
+                                  .author
+                              : "",
                           maxLines: 1,
                           style: GoogleFonts.poppins(
                               color: Colors.black, fontWeight: FontWeight.w500),
@@ -74,8 +87,12 @@ class _BaseScreenState extends State<BaseScreen> {
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(5.0),
                           child: Image(
-                            image: NetworkImage(musicPlayerProvider
-                                .thumbnail[musicPlayerProvider.currentIndex]),
+                            image: NetworkImage(
+                                musicPlayerProvider.songs.isNotEmpty
+                                    ? musicPlayerProvider
+                                        .songs[musicPlayerProvider.currentIndex]
+                                        .thumbnail
+                                    : ""),
                           ),
                         ),
                         trailing: Row(

@@ -67,8 +67,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
               image: DecorationImage(
                 fit: BoxFit.fill,
                 image: CachedNetworkImageProvider(
-                  musicPlayerProvider
-                      .thumbnail[musicPlayerProvider.currentIndex],
+                  musicPlayerProvider.songs.isNotEmpty
+                      ? musicPlayerProvider
+                          .songs[musicPlayerProvider.currentIndex].thumbnail
+                      : "https://www.seekpng.com/png/full/4-40317_music-note-icon-iconbros-music-note-icon-transparent.png",
                 ),
               ),
               // gradient: LinearGradient(
@@ -117,7 +119,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           PopupMenuItem(
                               onTap: () {
                                 Share.share(
-                                    'https://music.youtube.com/watch?v=${musicPlayerProvider.videoid[musicPlayerProvider.currentIndex]}',
+                                    'https://music.youtube.com/watch?v=${musicPlayerProvider.songs[musicPlayerProvider.currentIndex].videoid}',
                                     subject: 'Checkout this song');
                               },
                               child: const Row(
@@ -158,14 +160,22 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     ),
                                   );
                                 },
-                                imageUrl: musicPlayerProvider.thumbnail[
-                                            musicPlayerProvider.currentIndex]
-                                        .contains('?sqp=')
-                                    ? musicPlayerProvider.thumbnail[
-                                            musicPlayerProvider.currentIndex]
-                                        .split('?sqp=')[0]
-                                    : musicPlayerProvider.thumbnail[
-                                        musicPlayerProvider.currentIndex],
+                                imageUrl: musicPlayerProvider.songs.isNotEmpty
+                                    ? musicPlayerProvider
+                                            .songs[musicPlayerProvider
+                                                .currentIndex]
+                                            .thumbnail
+                                            .contains('?sqp=')
+                                        ? musicPlayerProvider
+                                            .songs[musicPlayerProvider
+                                                .currentIndex]
+                                            .thumbnail
+                                            .split('?sqp=')[0]
+                                        : musicPlayerProvider
+                                            .songs[musicPlayerProvider
+                                                .currentIndex]
+                                            .thumbnail
+                                    : "",
                                 width:
                                     MediaQuery.of(context).size.height * 0.387,
                                 height:
@@ -200,50 +210,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         child: Column(
                           children: [
                             SizedBox(
-                                child: musicPlayerProvider.title[
-                                            musicPlayerProvider.currentIndex] !=
-                                        ""
-                                    ? musicPlayerProvider
-                                                .title[musicPlayerProvider
-                                                    .currentIndex]
-                                                .length <=
-                                            28
-                                        ? Text(
-                                            musicPlayerProvider.title[
-                                                musicPlayerProvider
-                                                    .currentIndex],
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 25.0,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.center,
-                                          )
-                                        : SizedBox(
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05,
-                                            child: Marquee(
-                                              accelerationCurve:
-                                                  Curves.bounceIn,
-                                              style: GoogleFonts.poppins(
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.w500),
-                                              blankSpace: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.4,
-                                              text: musicPlayerProvider.title[
-                                                  musicPlayerProvider
-                                                      .currentIndex],
-                                              scrollAxis: Axis.horizontal,
-                                            ),
-                                          )
-                                    : Padding(
+                                child: musicPlayerProvider.songs.isEmpty
+                                    ? Padding(
                                         padding: const EdgeInsets.only(
                                             top: 10.0, bottom: 10.0),
                                         child: Shimmer.fromColors(
@@ -261,22 +229,81 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                     Radius.circular(8.0))),
                                           ),
                                         ),
-                                      )),
-                            SizedBox(
-                                child: musicPlayerProvider.author[
-                                            musicPlayerProvider.currentIndex] !=
-                                        ""
-                                    ? Text(
-                                        musicPlayerProvider.author[
-                                            musicPlayerProvider.currentIndex],
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 20.0,
-                                          color: Colors.white60,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
                                       )
-                                    : Shimmer.fromColors(
+                                    : musicPlayerProvider
+                                                .songs[musicPlayerProvider
+                                                    .currentIndex]
+                                                .title !=
+                                            ""
+                                        ? musicPlayerProvider
+                                                    .songs[musicPlayerProvider
+                                                        .currentIndex]
+                                                    .title
+                                                    .length <=
+                                                28
+                                            ? Text(
+                                                musicPlayerProvider
+                                                    .songs[musicPlayerProvider
+                                                        .currentIndex]
+                                                    .title,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 25.0,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.center,
+                                              )
+                                            : SizedBox(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.05,
+                                                child: Marquee(
+                                                  accelerationCurve:
+                                                      Curves.bounceIn,
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: 25,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                  blankSpace:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.4,
+                                                  text: musicPlayerProvider
+                                                      .songs[musicPlayerProvider
+                                                          .currentIndex]
+                                                      .title,
+                                                  scrollAxis: Axis.horizontal,
+                                                ),
+                                              )
+                                        : Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10.0, bottom: 10.0),
+                                            child: Shimmer.fromColors(
+                                              baseColor: Colors.white24,
+                                              highlightColor: Colors.white60,
+                                              child: Container(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.024,
+                                                width: 350.0,
+                                                decoration: const BoxDecoration(
+                                                    color: Colors.black,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                8.0))),
+                                              ),
+                                            ),
+                                          )),
+                            SizedBox(
+                                child: musicPlayerProvider.songs.isEmpty
+                                    ? Shimmer.fromColors(
                                         baseColor: Colors.white24,
                                         highlightColor: Colors.white60,
                                         child: Container(
@@ -290,7 +317,40 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(8.0)),
                                         ),
-                                      )),
+                                      )
+                                    : musicPlayerProvider
+                                                .songs[musicPlayerProvider
+                                                    .currentIndex]
+                                                .author !=
+                                            ""
+                                        ? Text(
+                                            musicPlayerProvider
+                                                .songs[musicPlayerProvider
+                                                    .currentIndex]
+                                                .author,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 20.0,
+                                              color: Colors.white60,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                          )
+                                        : Shimmer.fromColors(
+                                            baseColor: Colors.white24,
+                                            highlightColor: Colors.white60,
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.018,
+                                              width: 350.0,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0)),
+                                            ),
+                                          )),
                           ],
                         ),
                       ),

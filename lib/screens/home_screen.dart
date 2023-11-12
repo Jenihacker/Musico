@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:musico/components/playlist_container.dart';
-import 'package:musico/screens/about_screen.dart';
+import 'package:musico/screens/wrapper.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.black,
           toolbarHeight: 65.0,
           title: Text(
-            "$settext ${username!}",
+            "$settext $username",
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
               fontSize: 22.0,
@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => Navigator.push(
                     context,
                     PageTransition(
-                        child: const AboutScreen(),
+                        child: const Wrapper(),
                         type: PageTransitionType.rightToLeft)),
                 child: CircleAvatar(
                   radius: 30,

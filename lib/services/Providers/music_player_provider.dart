@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:musico/models/response/player_res.dart';
+import 'package:musico/models/song_info.dart';
 import 'package:musico/services/api/lyrics_api.dart';
 import 'package:musico/services/api/player_api.dart';
 
@@ -18,23 +19,16 @@ class MusicPlayerProvider extends ChangeNotifier {
   bool isMute = false;
   bool isPlaying = false;
   int currentIndex = 0;
-  List<String> title = [""];
-  List<String> author = [""];
-  List<String> thumbnail = [""];
-  List<String> streamlink = [""];
-  List<String> videoid = [""];
+  bool isNewSongSet = false;
+  List<SongInfo> songs = [];
   String lyrics = "";
   ConcatenatingAudioSource? audio;
 
   void initializeSongDetails(String song) async {
+    isNewSongSet = true;
     currentIndex = 0;
+    await advancedPlayer.stop();
     audio = ConcatenatingAudioSource(children: []);
-    await audio?.clear();
-    title = [""];
-    author = [""];
-    thumbnail = [""];
-    streamlink = [""];
-    videoid = [""];
     advancedPlayer.playingStream.listen((event) {
       isPlaying = event;
       notifyListeners();
@@ -51,22 +45,30 @@ class MusicPlayerProvider extends ChangeNotifier {
       notifyListeners();
     });
     SongDetailsRes? songinfo = await Player().getSongDetails(song);
-    title[0] = songinfo!.title;
-    author[0] = songinfo.author;
-    thumbnail[0] = songinfo.thumbnail;
-    streamlink[0] = songinfo.streamlink;
-    videoid[0] = songinfo.videoid;
+    songs.insert(
+        0,
+        SongInfo(
+            title: songinfo!.title,
+            author: songinfo.author,
+            thumbnail: songinfo.thumbnail,
+            streamlink: songinfo.streamlink,
+            videoid: songinfo.videoid));
     await playMusic();
     final response1 = await http
         .get(Uri.parse("https://ytmusic-tau.vercel.app/playerplaylist/$song"));
     var data1 = jsonDecode(response1.body.toString());
     data1.shuffle();
+    isNewSongSet = false;
     for (int i = 0; i < data1.length; i++) {
-      await _addNewSong(data1[i]);
+      if (!isNewSongSet) {
+        await _addNewSong(data1[i], i + 1);
+      } else {
+        break;
+      }
     }
     advancedPlayer.currentIndexStream.listen((event) {
       currentIndex = event ?? 0;
-      getSongLyrics(videoid[currentIndex]);
+      getSongLyrics(songs[currentIndex].videoid);
       notifyListeners();
     });
     notifyListeners();
@@ -103,27 +105,33 @@ class MusicPlayerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _addNewSong(String vid) async {
+  Future<void> _addNewSong(String vid, int index) async {
     SongDetailsRes? songinfo = await Player().getSongDetails(vid);
     try {
-      AudioSource metadata = AudioSource.uri(
-        Uri.parse(songinfo!.streamlink),
-        tag: MediaItem(
-          // Specify a unique ID for each media item:
-          id: '${audio!.children.length}',
-          // Metadata to display in the notification:
-          album: songinfo.author,
-          artist: songinfo.author,
-          title: songinfo.title,
-          artUri: Uri.parse(songinfo.thumbnail),
-        ),
-      );
-      await audio!.add(metadata);
-      author.add(songinfo.author);
-      title.add(songinfo.title);
-      thumbnail.add(songinfo.thumbnail);
-      videoid.add(songinfo.videoid);
-      print(audio!.children.first.toString());
+      if (!isNewSongSet) {
+        await audio!.insert(
+            index,
+            AudioSource.uri(
+              Uri.parse(songinfo!.streamlink),
+              tag: MediaItem(
+                // Specify a uniq ue ID for each media item:
+                id: '${audio!.children.length}',
+                // Metadata to display in the notification:
+                album: songinfo.author,
+                artist: songinfo.author,
+                title: songinfo.title,
+                artUri: Uri.parse(songinfo.thumbnail),
+              ),
+            ));
+        songs.insert(
+            index,
+            SongInfo(
+                title: songinfo.title,
+                author: songinfo.author,
+                thumbnail: songinfo.thumbnail,
+                streamlink: songinfo.streamlink,
+                videoid: songinfo.videoid));
+      }
     } catch (e, stacktrace) {
       print('$e $stacktrace');
     }
@@ -136,18 +144,20 @@ class MusicPlayerProvider extends ChangeNotifier {
       await advancedPlayer.pause();
       await advancedPlayer.seekToNext();
       await advancedPlayer.play();
+      notifyListeners();
     } else {
       final response = await http.get(Uri.parse(
-          "https://ytmusic-tau.vercel.app/next/${videoid[currentIndex]}"));
+          "https://ytmusic-tau.vercel.app/next/${songs[currentIndex].videoid}"));
       var data = jsonDecode(response.body.toString());
-      if (videoid[currentIndex] == data[0]["videoid"]) {
+      if (songs[currentIndex].videoid == data[0]["videoid"]) {
         playNextSong();
       }
-      author.add(data[0]["author"]);
-      title.add(data[0]["title"]);
-      thumbnail.add(data[0]["thumbnail"]);
-
-      videoid.add(data[0]["videoid"]);
+      songs.add(SongInfo(
+          title: data[0]["title"],
+          author: data[0]["author"],
+          thumbnail: data[0]["thumbnail"],
+          streamlink: data[0]["streamlinks"][0]["url"],
+          videoid: data[0]["videoid"]));
 
       AudioSource metadata = AudioSource.uri(
         Uri.parse(data[0]["streamlinks"][0]["url"]),
@@ -171,19 +181,18 @@ class MusicPlayerProvider extends ChangeNotifier {
   //initial music playback
   Future<void> playMusic() async {
     AudioSource metadata = AudioSource.uri(
-      Uri.parse(streamlink[0]),
+      Uri.parse(songs[0].streamlink),
       tag: MediaItem(
         // Specify a unique ID for each media item:
         id: '${0}',
         // Metadata to display in the notification:
-        album: author[0],
-        artist: author[0],
-        title: title[0],
-        artUri: Uri.parse(thumbnail[0]),
+        album: songs[0].author,
+        artist: songs[0].author,
+        title: songs[0].title,
+        artUri: Uri.parse(songs[0].thumbnail),
       ),
     );
-    audio = ConcatenatingAudioSource(children: []);
-    await audio!.add(metadata);
+    await audio!.insert(0, metadata);
     await advancedPlayer.setAudioSource(audio!);
     advancedPlayer.play();
     notifyListeners();

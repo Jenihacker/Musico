@@ -32,159 +32,275 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Container(
-      color: Colors.black,
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: const Color(0XFFC4FC4C),
-                elevation: 0,
-                leading: Padding(
-                  padding: const EdgeInsets.only(top: 5.0, left: 5.0),
-                  child: ElevatedButton(
-                      style: const ButtonStyle(
-                          shape: MaterialStatePropertyAll(CircleBorder()),
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.black)),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Icon(Icons.arrow_back_ios)),
-                ),
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: const Color(0XFFC4FC4C),
+              elevation: 0,
+              leading: Padding(
+                padding: const EdgeInsets.only(top: 5.0, left: 5.0),
+                child: ElevatedButton(
+                    style: const ButtonStyle(
+                        shape: MaterialStatePropertyAll(CircleBorder()),
+                        backgroundColor:
+                            MaterialStatePropertyAll(Colors.black)),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Icon(Icons.arrow_back_ios)),
               ),
-              backgroundColor: Colors.black38,
-              body: Consumer<MusicPlayerProvider>(
-                  builder: (_, musicPlayerProvider, child) {
-                return FutureBuilder(
-                    future: getPlaylistSongs,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasData) {
-                          return Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                decoration: const BoxDecoration(
-                                    color: Color(0XFFC4FC4C),
-                                    borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(40.0),
-                                        bottomRight: Radius.circular(40.0))),
-                                child: Column(children: [
-                                  Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 25.0, bottom: 20.0),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        child: Image(
-                                            width: 250,
-                                            height: 250,
-                                            image: CachedNetworkImageProvider(
-                                                snapshot
-                                                    .data!.thumbnails[3].url)),
-                                      ),
-                                    ),
-                                  ),
-                                  Center(
-                                    child: Text(
-                                      snapshot.data!.title,
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.black,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Center(
-                                    child: Text(
-                                      snapshot.data!.description,
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                  )
-                                ]),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Expanded(
-                                child: ListView.builder(
-                                    itemCount: snapshot.data!.tracks.isEmpty
-                                        ? 10
-                                        : snapshot.data!.tracks.length,
-                                    itemBuilder: (context, index) {
-                                      return ListTile(
-                                        leading: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                          child: Image.network(
-                                            snapshot
-                                                .data!
-                                                .tracks[index]
-                                                .thumbnails[snapshot
-                                                        .data!
-                                                        .tracks[index]
-                                                        .thumbnails
-                                                        .length -
-                                                    1]
-                                                .url
-                                                .split('?sqp=')[0],
-                                            fit: BoxFit.cover,
-                                            width: 80,
-                                            height: 80,
+            ),
+            backgroundColor: Colors.black,
+            body: Stack(
+              children: [
+                Consumer<MusicPlayerProvider>(
+                    builder: (_, musicPlayerProvider, child) {
+                  return SingleChildScrollView(
+                    child: FutureBuilder(
+                        future: getPlaylistSongs,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.hasData) {
+                              return Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(bottom: 20.0),
+                                    decoration: const BoxDecoration(
+                                        color: Color(0XFFC4FC4C),
+                                        borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(40.0),
+                                            bottomRight: Radius.circular(40.0))),
+                                    child: Column(children: [
+                                      Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 25.0, bottom: 20.0),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            child: Image(
+                                                width: 250,
+                                                height: 250,
+                                                image: CachedNetworkImageProvider(
+                                                    snapshot
+                                                        .data!.thumbnails[3].url)),
                                           ),
                                         ),
-                                        title: Text(
-                                          snapshot.data!.tracks[index].title,
+                                      ),
+                                      Center(
+                                        child: Text(
+                                          snapshot.data!.title,
                                           style: GoogleFonts.poppins(
-                                              fontSize: 15.0,
+                                            color: Colors.black,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: Text(
+                                          snapshot.data!.description,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.black,
+                                              fontSize: 15,
                                               fontWeight: FontWeight.w500),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        subtitle: Text(
-                                          snapshot.data!.tracks[index]
-                                              .artists[0].name,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 12.0),
-                                        ),
-                                        onTap: () {
-                                          musicPlayerProvider
-                                              .initializeSongDetails(snapshot
-                                                  .data!.tracks[index].videoId);
-                                          Navigator.push(
-                                              context,
-                                              PageTransition(
-                                                  child: const PlayerScreen(),
-                                                  type: PageTransitionType
-                                                      .bottomToTop));
-                                        },
-                                      );
-                                    }),
-                              )
-                            ],
-                          );
-                        } else {
-                          if (snapshot.hasError) {
-                            return const Center(
-                              child: Text('No Network Connectivity'),
-                            );
+                                      )
+                                    ]),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: snapshot.data!.tracks.isEmpty
+                                          ? 10
+                                          : snapshot.data!.tracks.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          leading: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            child: Image.network(
+                                              snapshot
+                                                  .data!
+                                                  .tracks[index]
+                                                  .thumbnails[snapshot
+                                                          .data!
+                                                          .tracks[index]
+                                                          .thumbnails
+                                                          .length -
+                                                      1]
+                                                  .url
+                                                  .split('?sqp=')[0],
+                                              fit: BoxFit.cover,
+                                              width: 80,
+                                              height: 80,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            snapshot.data!.tracks[index].title,
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.w500),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          subtitle: Text(
+                                            snapshot.data!.tracks[index].artists[0]
+                                                .name,
+                                            style:
+                                                GoogleFonts.poppins(fontSize: 12.0),
+                                          ),
+                                          onTap: () {
+                                            musicPlayerProvider
+                                                .initializeSongDetails(snapshot
+                                                    .data!.tracks[index].videoId);
+                                            Navigator.push(
+                                                context,
+                                                PageTransition(
+                                                    child: const PlayerScreen(),
+                                                    type: PageTransitionType
+                                                        .bottomToTop));
+                                          },
+                                        );
+                                      }),
+                                      const SizedBox(
+                                        height: 85,
+                                      )
+                                ],
+                              );
+                            } else {
+                              if (snapshot.hasError) {
+                                return const Center(
+                                  child: Text('No Network Connectivity'),
+                                );
+                              } else {
+                                return const CircularProgressIndicator();
+                              }
+                            }
                           } else {
-                            return const CircularProgressIndicator();
+                            return const PlaylistShimmer();
                           }
-                        }
-                      } else {
-                        return const PlaylistShimmer();
-                      }
-                    });
-              })),
-        ),
-      ),
-    ));
+                        }),
+                  );
+                }),
+                Consumer<MusicPlayerProvider>(
+                    builder: (_, musicPlayerProvider, child) {
+                  return Positioned(
+                      bottom: 5,
+                      child: Visibility(
+                        visible: musicPlayerProvider.audio == null ||
+                                musicPlayerProvider.songs == []
+                            ? false
+                            : true,
+                        child: Container(
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                          decoration: BoxDecoration(
+                              color: const Color(0XFFC4FC4C),
+                              borderRadius: BorderRadius.circular(10.0)),
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          child: GestureDetector(
+                            onVerticalDragEnd: (details) async {
+                              await musicPlayerProvider.advancedPlayer.stop();
+                              musicPlayerProvider.audio = null;
+                              musicPlayerProvider.isNewSongSet = true;
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: ListTile(
+                                title: Text(
+                                  musicPlayerProvider.songs.isNotEmpty
+                                      ? musicPlayerProvider
+                                          .songs[
+                                              musicPlayerProvider.currentIndex]
+                                          .title
+                                      : "",
+                                  maxLines: 1,
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(
+                                  musicPlayerProvider.songs.isNotEmpty
+                                      ? musicPlayerProvider
+                                          .songs[
+                                              musicPlayerProvider.currentIndex]
+                                          .author
+                                      : "",
+                                  maxLines: 1,
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  child: Image(
+                                    image: NetworkImage(
+                                        musicPlayerProvider.songs.isNotEmpty
+                                            ? musicPlayerProvider
+                                                .songs[musicPlayerProvider
+                                                    .currentIndex]
+                                                .thumbnail
+                                            : ""),
+                                  ),
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      iconSize: 35,
+                                      icon: musicPlayerProvider.isPlaying
+                                          ? const Icon(
+                                              Icons.pause,
+                                              size: 35,
+                                              color: Colors.black,
+                                            )
+                                          : const Icon(
+                                              Icons.play_arrow,
+                                              size: 35,
+                                              color: Colors.black,
+                                            ),
+                                      onPressed: () {
+                                        musicPlayerProvider.togglePlayback();
+                                      },
+                                    ),
+                                    Visibility(
+                                      visible: musicPlayerProvider
+                                              .advancedPlayer.hasNext
+                                          ? true
+                                          : false,
+                                      child: IconButton(
+                                        iconSize: 35,
+                                        icon: const Icon(
+                                          Icons.skip_next,
+                                          color: Colors.black,
+                                        ),
+                                        onPressed: () {
+                                          musicPlayerProvider.playNextSong();
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  PageTransition(
+                                      child: const PlayerScreen(),
+                                      type: PageTransitionType.bottomToTop));
+                            },
+                          ),
+                        ),
+                      ));
+                })
+              ],
+            )));
   }
 
   Future<PlaylistSongs> getPlaylist(String pid) async {

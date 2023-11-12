@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:musico/services/Providers/music_player_provider.dart';
 import 'package:musico/services/api/search_song_api.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:musico/screens/player_screen.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:musico/shimmers/searchresult_shimmer.dart';
@@ -332,15 +330,24 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                   color: const Color(0XFFC4FC4C),
                                   borderRadius: BorderRadius.circular(10.0)),
                               width: MediaQuery.of(context).size.width * 0.95,
-                              child: InkWell(
+                              child: GestureDetector(
+                                onVerticalDragEnd: (details) {
+                                  musicPlayerProvider.advancedPlayer.stop();
+                                  musicPlayerProvider.audio = null;
+                                  musicPlayerProvider.isNewSongSet = true;
+                                },
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12.0),
                                   child: Column(
                                     children: [
                                       ListTile(
                                         title: Text(
-                                          musicPlayerProvider.title[
-                                              musicPlayerProvider.currentIndex],
+                                          musicPlayerProvider.songs.isNotEmpty
+                                              ? musicPlayerProvider
+                                                  .songs[musicPlayerProvider
+                                                      .currentIndex]
+                                                  .title
+                                              : "",
                                           maxLines: 1,
                                           style: GoogleFonts.poppins(
                                               color: Colors.black,
@@ -348,8 +355,12 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Text(
-                                          musicPlayerProvider.author[
-                                              musicPlayerProvider.currentIndex],
+                                          musicPlayerProvider.songs.isNotEmpty
+                                              ? musicPlayerProvider
+                                                  .songs[musicPlayerProvider
+                                                      .currentIndex]
+                                                  .author
+                                              : "",
                                           maxLines: 1,
                                           style: GoogleFonts.poppins(
                                               color: Colors.black,
@@ -361,9 +372,14 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                               BorderRadius.circular(5.0),
                                           child: Image(
                                             image: NetworkImage(
-                                                musicPlayerProvider.thumbnail[
-                                                    musicPlayerProvider
-                                                        .currentIndex]),
+                                                musicPlayerProvider
+                                                        .songs.isNotEmpty
+                                                    ? musicPlayerProvider
+                                                        .songs[
+                                                            musicPlayerProvider
+                                                                .currentIndex]
+                                                        .thumbnail
+                                                    : ""),
                                           ),
                                         ),
                                         trailing: Row(
@@ -431,15 +447,5 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         );
       }),
     );
-  }
-
-  Future<List<dynamic>> getData(dynamic query, String type) async {
-    final response = await http
-        .get(Uri.parse('https://ytmusic-tau.vercel.app/?search=$query'));
-    var data = jsonDecode(response.body.toString());
-    if (response.statusCode == 200) {
-      return data[type];
-    }
-    return data[type];
   }
 }
