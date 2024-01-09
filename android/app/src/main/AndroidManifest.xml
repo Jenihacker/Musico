@@ -28,7 +28,8 @@
         android:label="Musico"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        >
         
         <activity
             android:name="com.ryanheise.audioservice.AudioServiceActivity"

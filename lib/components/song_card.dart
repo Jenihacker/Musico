@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/models/playlist_category.dart';
 import 'package:musico/screens/playlist_screen.dart';
 import 'package:page_transition/page_transition.dart';
@@ -69,7 +70,7 @@ class _SongCardState extends State<SongCard> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.nunitoSans(
-                  color: Colors.white,
+                  color: listTitleTextColor,
                   fontSize: 16,
                   fontWeight: FontWeight.w700),
             ),
@@ -83,7 +84,7 @@ class _SongCardState extends State<SongCard> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.nunitoSans(
-                color: Colors.white60,
+                color: listSubtitleTextColor,
                 fontSize: 12,
               ),
             ),

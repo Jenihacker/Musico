@@ -41,11 +41,13 @@ class _MyAppState extends State<MyApp> {
       child: GetMaterialApp(
         title: 'Musico',
         debugShowCheckedModeBanner: false,
+        color: Colors.white,
         theme: ThemeData(
+          primaryColor: Colors.white,
           primarySwatch: Colors.deepPurple,
           textTheme: Theme.of(context).textTheme.apply(
-                bodyColor: Colors.white,
-                displayColor: Colors.white,
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
               ),
         ),
         home: widget.prefs.getString('username') == null &&

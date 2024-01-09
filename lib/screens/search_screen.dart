@@ -4,6 +4,7 @@ import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/screens/search_results.dart';
 import 'package:musico/services/api/search_suggestions_api.dart';
 import 'package:page_transition/page_transition.dart';
@@ -17,7 +18,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late dynamic message;
+  dynamic message = "";
   String recognizedText = "";
   bool available = false;
   bool _isListening = false;
@@ -35,6 +36,9 @@ class _SearchScreenState extends State<SearchScreen> {
         onResult: (result) {
           setState(() {
             recognizedText = result.recognizedWords;
+          });
+          super.setState(() {
+            message = result.recognizedWords;
           });
         },
       );
@@ -114,142 +118,154 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   SizedBox(
                       child: TypeAheadField(
-                    hideSuggestionsOnKeyboardHide: true,
-                    textFieldConfiguration: TextFieldConfiguration(
-                      cursorColor: Colors.white,
-                      style: GoogleFonts.poppins(
-                        fontSize: 20.0,
-                      ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  child: SearchResultScreen(message: value),
-                                  type:
-                                      PageTransitionType.rightToLeftWithFade));
-                        }
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0XFF1e1c22),
-                        hintText: 'Search',
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.only(left: 5.0),
-                          child: Icon(
-                            BootstrapIcons.search,
-                            color: Colors.white,
-                          ),
+                    hideOnEmpty: true,
+                    hideOnLoading: true,
+                    controller: TextEditingController(text: message),
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                        cursorColor: Colors.white,
+                        style: GoogleFonts.poppins(
+                          fontSize: 20.0,
                         ),
-                        suffixIcon: IconButton(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          splashRadius: 10,
-                          icon: const Icon(Icons.mic, size: 30.0),
-                          onPressed: () {
-                            setState(() {
-                              _isListening = false;
-                            });
-                            showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  StatefulBuilder(builder: (context, setState) {
-                                return AlertDialog(
-                                  backgroundColor: const Color(0XFF1e1c22),
-                                  actionsPadding: const EdgeInsets.symmetric(
-                                      vertical: 40.0),
-                                  title: Text('Tap To Speak',
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 30.0,
-                                        fontWeight: FontWeight.bold,
-                                      )),
-                                  actionsAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  actions: [
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Text(recognizedText,
-                                          textAlign: TextAlign.center,
-                                          overflow: TextOverflow.ellipsis,
-                                          style:
-                                              const TextStyle(fontSize: 30.0)),
-                                    ),
-                                    Center(
-                                        child: AvatarGlow(
-                                      glowColor: const Color(0XFFC4FC4C),
-                                      endRadius: 80.0,
-                                      animate: _isListening,
-                                      repeat: true,
-                                      child: InkWell(
-                                        overlayColor:
-                                            const MaterialStatePropertyAll(
-                                                Colors.transparent),
-                                        onTap: () async {
-                                          setState((() {
-                                            _isListening = !_isListening;
-                                          }));
-                                          if (_isListening) {
-                                            listenSpeech(setState);
-                                          } else {
-                                            stopSpeech(setState);
-                                          }
-                                        },
-                                        child: CircleAvatar(
-                                          radius: 40.0,
-                                          backgroundColor:
-                                              const Color(0XFFC4FC4C),
-                                          child: Icon(
-                                            _isListening
-                                                ? Icons.mic
-                                                : Icons.mic_none,
-                                            size: 40.0,
-                                            color: Colors.black,
+                        focusNode: focusNode,
+                        enableSuggestions: true,
+                        decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0XFF1e1c22),
+                            hintText: 'Search',
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.only(left: 5.0),
+                              child: Icon(
+                                BootstrapIcons.search,
+                                color: Colors.white,
+                              ),
+                            ),
+                            hintStyle: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              padding: const EdgeInsets.only(right: 10.0),
+                              splashRadius: 10,
+                              color: iconColor,
+                              onPressed: () {
+                                setState(() {
+                                  _isListening = false;
+                                });
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return AlertDialog(
+                                        backgroundColor:
+                                            const Color(0XFF1e1c22),
+                                        actionsPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 40.0),
+                                        title: Text('Tap To Speak',
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 30.0,
+                                              fontWeight: FontWeight.bold,
+                                            )),
+                                        actionsAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        actions: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: Text(recognizedText,
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontSize: 30.0)),
                                           ),
-                                        ),
-                                      ),
-                                    ))
-                                  ],
+                                          Center(
+                                              child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: AvatarGlow(
+                                              glowColor: primaryThemeColor,
+                                              animate: _isListening,
+                                              repeat: true,
+                                              child: InkWell(
+                                                overlayColor:
+                                                    const MaterialStatePropertyAll(
+                                                        Colors.transparent),
+                                                onTap: () async {
+                                                  setState((() {
+                                                    _isListening =
+                                                        !_isListening;
+                                                  }));
+                                                  if (_isListening) {
+                                                    listenSpeech(setState);
+                                                  } else {
+                                                    stopSpeech(setState);
+                                                  }
+                                                },
+                                                child: CircleAvatar(
+                                                  radius: 40.0,
+                                                  backgroundColor:
+                                                      primaryThemeColor,
+                                                  child: Icon(
+                                                    _isListening
+                                                        ? Icons.mic
+                                                        : Icons.mic_none,
+                                                    size: 40.0,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ))
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 );
-                              }),
-                            );
-                          },
-                          color: Colors.white,
-                        ),
-                        hintStyle: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                            borderSide: BorderSide.none),
-                      ),
-                      enableSuggestions: true,
-                    ),
-                    suggestionsCallback: (pattern) async {
-                      return await SearchSuggestionApi()
-                              .getSuggestion(pattern) ??
-                          [];
-                      //return ['Song not found'];
+                              },
+                              icon: const Icon(Icons.mic, size: 30.0),
+                            )),
+                        controller: controller,
+                        onSubmitted: (value) {
+                          if (value.isNotEmpty) {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    child: SearchResultScreen(message: value),
+                                    type: PageTransitionType
+                                        .rightToLeftWithFade));
+                          }
+                        },
+                      );
                     },
-                    itemBuilder: (context, itemData) {
+                    decorationBuilder: (context, child) {
+                      return Material(
+                        type: MaterialType.card,
+                        color: const Color(0XFF1e1c22),
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(20),
+                        child: child,
+                      );
+                    },
+                    itemBuilder: (context, value) {
                       return Container(
-                        decoration: const BoxDecoration(
-                            gradient: LinearGradient(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: const LinearGradient(
                                 begin: Alignment.topRight,
                                 end: Alignment.topLeft,
                                 colors: [
-                              //Color(0XFF000000),
-                              // Color.fromARGB(223, 109, 2, 6),
-                              // Color.fromARGB(223, 5, 15, 86),
-                              Color(0XFF1e1c22),
-                              Color(0XFF1e1c22)
-                              //Color(0XFF000000),
-                            ])),
+                                  Color(0XFF1e1c22),
+                                  Color(0XFF1e1c22),
+                                ])),
                         child: ListTile(
                           leading: const Icon(Icons.music_note_outlined,
                               color: Colors.white),
                           title: Text(
-                            itemData,
+                            value,
                             style: GoogleFonts.poppins(
                               color: Colors.white,
                             ),
@@ -258,21 +274,21 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       );
                     },
-                    getImmediateSuggestions: true,
-                    minCharsForSuggestions: 1,
-                    loadingBuilder: (context) {
-                      return const CircularProgressIndicator();
-                    },
-                    hideOnLoading: true,
-                    onSuggestionSelected: (suggestion) {
+                    onSelected: (value) {
+                      setState(() {
+                        message = value;
+                      });
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
-                          return SearchResultScreen(message: suggestion);
+                          return SearchResultScreen(message: value.toString());
                         },
                       ));
                     },
-                    hideOnError: true,
-                    hideOnEmpty: true,
+                    suggestionsCallback: (search) async {
+                      return await SearchSuggestionApi()
+                              .getSuggestion(search) ??
+                          [];
+                    },
                   )),
                 ])),
       ),

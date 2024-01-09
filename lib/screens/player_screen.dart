@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/services/Providers/music_player_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -27,7 +28,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         progress: musicPlayerProvider.currentslidervalue,
         buffered: musicPlayerProvider.advancedPlayer.bufferedPosition,
         total: musicPlayerProvider.advancedPlayer.duration ?? Duration.zero,
-        progressBarColor: const Color(0XFFC4FC4C),
+        progressBarColor: primaryThemeColor,
         baseBarColor: Colors.white.withOpacity(0.24),
         bufferedBarColor: Colors.white.withOpacity(0.3),
         thumbColor: Colors.white,
@@ -100,6 +101,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       icon: const Icon(
                         Icons.keyboard_arrow_down,
                         size: 35,
+                        color: appBarLeadingColor,
                       ),
                       onPressed: () {
                         Get.back();
@@ -108,12 +110,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     centerTitle: true,
                     title: Text(
                       'Now Playing',
-                      style: GoogleFonts.poppins(fontSize: 20.0),
+                      style: GoogleFonts.poppins(
+                        fontSize: 20.0,
+                        color: appBarTitleTextColor,
+                      ),
                     ),
                     actions: [
                       PopupMenuButton(
                         icon: const FaIcon(FontAwesomeIcons.ellipsisVertical,
-                            color: Colors.white),
+                            color: iconColor),
                         color: const Color(0XFF242424),
                         itemBuilder: (context) => [
                           PopupMenuItem(
@@ -124,9 +129,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               },
                               child: const Row(
                                 children: [
-                                  Icon(Icons.share),
+                                  Icon(Icons.share, color: iconColor),
                                   Spacer(),
-                                  Text('Share')
+                                  Text(
+                                    'Share',
+                                    style: TextStyle(color: normalTextColor),
+                                  )
                                 ],
                               )),
                         ],
@@ -249,6 +257,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                 style: GoogleFonts.poppins(
                                                   fontSize: 25.0,
                                                   fontWeight: FontWeight.w500,
+                                                  color: playerTitleColor,
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                                 textAlign: TextAlign.center,
@@ -266,6 +275,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                       Curves.bounceIn,
                                                   style: GoogleFonts.poppins(
                                                       fontSize: 25,
+                                                      color: playerTitleColor,
                                                       fontWeight:
                                                           FontWeight.w500),
                                                   blankSpace:
@@ -330,7 +340,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                                 .author,
                                             style: GoogleFonts.poppins(
                                               fontSize: 20.0,
-                                              color: Colors.white60,
+                                              color: playerSubtitleColor,
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                             textAlign: TextAlign.center,
@@ -373,7 +383,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       musicPlayerProvider.isMute
                                           ? Icons.volume_off
                                           : Icons.volume_up,
-                                      color: Colors.white,
+                                      color: iconColor,
                                       size: 35.0,
                                     ),
                                     onTap: () {
@@ -384,7 +394,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     borderRadius: BorderRadius.circular(20.0),
                                     child: const Icon(
                                       Icons.skip_previous_rounded,
-                                      color: Colors.white,
+                                      color: iconColor,
                                       size: 50.0,
                                     ),
                                     onTap: () {
@@ -397,7 +407,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       musicPlayerProvider.isPlaying
                                           ? Icons.pause_circle_filled
                                           : Icons.play_circle,
-                                      color: Colors.white,
+                                      color: iconColor,
                                       size: 80.0,
                                     ),
                                     onTap: () {
@@ -418,7 +428,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     },
                                     child: const Icon(
                                       Icons.skip_next_rounded,
-                                      color: Colors.white,
+                                      color: iconColor,
                                       size: 50.0,
                                     ),
                                   ),
@@ -431,7 +441,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       musicPlayerProvider.isLoop
                                           ? Icons.repeat_one
                                           : Icons.repeat,
-                                      color: Colors.white,
+                                      color: iconColor,
                                       size: 35.0,
                                     ),
                                   )
@@ -446,7 +456,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         height: 330, //MediaQuery.of(context).size.height * 0.4,
                         decoration: const BoxDecoration(
                             shape: BoxShape.rectangle,
-                            color: Color(0XFFC4FC4C),
+                            color: primaryThemeColor,
                             //color: Color(0X5A240b36),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10.0)),
@@ -463,7 +473,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   style: GoogleFonts.poppins(
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black),
+                                      color: lyricsColor),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -478,7 +488,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     musicPlayerProvider.lyrics,
                                     style: GoogleFonts.poppins(
                                         fontSize: 21.0,
-                                        color: Colors.black,
+                                        color: lyricsColor,
                                         fontWeight: FontWeight.w600),
                                   ),
                                 ),

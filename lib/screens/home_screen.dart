@@ -1,6 +1,7 @@
 //import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/components/playlist_container.dart';
 import 'package:musico/screens/wrapper.dart';
 import 'package:page_transition/page_transition.dart';
@@ -68,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GoogleFonts.poppins(
               fontSize: 22.0,
               fontWeight: FontWeight.w600,
+              color: appBarTitleTextColor,
             ),
           ),
           actions: [
@@ -100,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Chill",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "chill"),
@@ -110,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Commute",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "commute"),
@@ -120,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Energy Booster",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "energy booster"),
@@ -130,6 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Feel Good",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "feel good"),
@@ -140,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Focus",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "focus"),
@@ -150,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Party",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "party"),
@@ -160,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Romance",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "romance"),
@@ -170,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Sleep",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "sleep"),
@@ -180,6 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Workout",
                   style: GoogleFonts.pacifico(
                     fontSize: 30,
+                    color: homeScreenTitleTextColor
                   ),
                 ),
                 const PlaylistContainer(title: "workout"),

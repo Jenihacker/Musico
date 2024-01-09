@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/screens/base_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -74,7 +75,7 @@ class _WrapperState extends State<Wrapper> {
                       child: Container(
                         padding: const EdgeInsets.all(5.0),
                         decoration: BoxDecoration(
-                            color: const Color(0XFFC4FC4C),
+                            color: primaryThemeColor,
                             borderRadius: BorderRadius.circular(50.0)),
                         child: const Icon(
                           Icons.camera_alt,
@@ -104,13 +105,13 @@ class _WrapperState extends State<Wrapper> {
                         label: const Text('Username',
                             style: TextStyle(color: Colors.white)),
                         border: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0XFFC4FC4C)),
+                          borderSide: BorderSide(color: primaryThemeColor),
                         ),
                         focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0XFFC4FC4C)),
+                          borderSide: BorderSide(color: primaryThemeColor),
                         ),
                         enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Color(0XFFC4FC4C)),
+                          borderSide: BorderSide(color: primaryThemeColor),
                         ),
                         fillColor: const Color(0XFF1e1c22),
                         hintText: 'Enter your username',
@@ -148,8 +149,7 @@ class _WrapperState extends State<Wrapper> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(50.0),
                                   border: Border.all(
-                                      color: const Color(0XFFC4FC4C),
-                                      width: 3)),
+                                      color: primaryThemeColor, width: 3)),
                               child: CircleAvatar(
                                 backgroundImage: AssetImage(avatars[index]),
                               ),
@@ -182,7 +182,7 @@ class _WrapperState extends State<Wrapper> {
                           const MaterialStatePropertyAll(Size(300, 50)),
                       backgroundColor: username == ""
                           ? const MaterialStatePropertyAll(Colors.grey)
-                          : const MaterialStatePropertyAll(Color(0XFFC4FC4C))),
+                          : const MaterialStatePropertyAll(primaryThemeColor)),
                   child: Text(
                     'Submit',
                     style: GoogleFonts.poppins(

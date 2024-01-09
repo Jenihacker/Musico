@@ -1,5 +1,6 @@
 import 'package:bootstrap_icons/bootstrap_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/services/Providers/music_player_provider.dart';
 import 'package:musico/services/api/search_song_api.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,9 +52,11 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   backgroundColor: Colors.black26,
                   elevation: 0,
                   bottom: const TabBar(
-                      indicatorColor: Color(0XFFC4FC4C),
-                      labelColor: Color(0XFFC4FC4C),
+                      indicatorColor: primaryThemeColor,
+                      labelColor: primaryThemeColor,
                       unselectedLabelColor: Colors.grey,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      splashFactory: InkRipple.splashFactory,
                       tabs: [
                         Tab(
                             icon: Icon(
@@ -69,7 +72,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: const Icon(Icons.arrow_back_ios_new),
+                    icon: const Icon(Icons.arrow_back_ios_new,
+                        color: appBarLeadingColor),
                   ),
                   actions: [
                     GestureDetector(
@@ -85,6 +89,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                               widget.message,
                               style: GoogleFonts.poppins(
                                 fontSize: 25,
+                                color: appBarTitleTextColor,
                               ),
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.end,
@@ -167,7 +172,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                       title: Text(
                                         snapshot.data![index]!.title,
                                         style: GoogleFonts.nunito(
-                                          color: Colors.white,
+                                          color: listTitleTextColor,
                                           fontWeight: FontWeight.bold,
                                         ),
                                         overflow: TextOverflow.ellipsis,
@@ -175,7 +180,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                       subtitle: Text(
                                         snapshot.data![index]!.artists,
                                         style: GoogleFonts.poppins(
-                                            color: Colors.white70),
+                                            color: listSubtitleTextColor),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       onTap: () {
@@ -242,7 +247,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                           const Icon(
                                             Icons.play_circle_sharp,
                                             size: 27,
-                                            color: Colors.white,
+                                            color: iconColor,
                                           ),
                                           Text(
                                             snapshot.data![index]!.duration,
@@ -274,7 +279,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                       title: Text(
                                         snapshot.data![index]!.title,
                                         style: GoogleFonts.nunito(
-                                          color: Colors.white,
+                                          color: listTitleTextColor,
                                           fontWeight: FontWeight.bold,
                                         ),
                                         overflow: TextOverflow.ellipsis,
@@ -282,7 +287,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                                       subtitle: Text(
                                         snapshot.data![index]!.artists,
                                         style: GoogleFonts.poppins(
-                                            color: Colors.white70),
+                                            color: listSubtitleTextColor),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       onTap: () {
@@ -327,7 +332,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 10.0),
                               decoration: BoxDecoration(
-                                  color: const Color(0XFFC4FC4C),
+                                  color: primaryThemeColor,
                                   borderRadius: BorderRadius.circular(10.0)),
                               width: MediaQuery.of(context).size.width * 0.95,
                               child: GestureDetector(

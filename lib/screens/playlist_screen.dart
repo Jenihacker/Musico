@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:musico/colors/color.dart';
 import 'package:musico/models/playlist_songs.dart';
 import 'package:http/http.dart' as http;
 import 'package:musico/screens/player_screen.dart';
@@ -34,17 +35,20 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color(0XFFC4FC4C),
+              backgroundColor: primaryThemeColor,
               elevation: 0,
               leading: Padding(
-                padding: const EdgeInsets.only(top: 5.0, left: 5.0),
-                child: ElevatedButton(
+                padding: const EdgeInsets.only(top: 5.0, left: 5.0, right: 5.0),
+                child: IconButton(
                     style: const ButtonStyle(
                         shape: MaterialStatePropertyAll(CircleBorder()),
                         backgroundColor:
                             MaterialStatePropertyAll(Colors.black)),
                     onPressed: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back_ios)),
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: appBarLeadingColor,
+                    )),
               ),
             ),
             backgroundColor: Colors.black,
@@ -56,17 +60,20 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                     child: FutureBuilder(
                         future: getPlaylistSongs,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
                             if (snapshot.hasData) {
                               return Column(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.only(bottom: 20.0),
+                                    padding:
+                                        const EdgeInsets.only(bottom: 20.0),
                                     decoration: const BoxDecoration(
-                                        color: Color(0XFFC4FC4C),
+                                        color: primaryThemeColor,
                                         borderRadius: BorderRadius.only(
                                             bottomLeft: Radius.circular(40.0),
-                                            bottomRight: Radius.circular(40.0))),
+                                            bottomRight:
+                                                Radius.circular(40.0))),
                                     child: Column(children: [
                                       Center(
                                         child: Padding(
@@ -78,9 +85,12 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                             child: Image(
                                                 width: 250,
                                                 height: 250,
-                                                image: CachedNetworkImageProvider(
-                                                    snapshot
-                                                        .data!.thumbnails[3].url)),
+                                                image:
+                                                    CachedNetworkImageProvider(
+                                                        snapshot
+                                                            .data!
+                                                            .thumbnails[3]
+                                                            .url)),
                                           ),
                                         ),
                                       ),
@@ -111,7 +121,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                   ),
                                   ListView.builder(
                                       shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       itemCount: snapshot.data!.tracks.isEmpty
                                           ? 10
                                           : snapshot.data!.tracks.length,
@@ -141,20 +152,24 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                             snapshot.data!.tracks[index].title,
                                             style: GoogleFonts.poppins(
                                                 fontSize: 15.0,
+                                                color: listTitleTextColor,
                                                 fontWeight: FontWeight.w500),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           subtitle: Text(
-                                            snapshot.data!.tracks[index].artists[0]
-                                                .name,
-                                            style:
-                                                GoogleFonts.poppins(fontSize: 12.0),
+                                            snapshot.data!.tracks[index]
+                                                .artists[0].name,
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 12.0,
+                                                color: listSubtitleTextColor),
                                           ),
                                           onTap: () {
                                             musicPlayerProvider
                                                 .initializeSongDetails(snapshot
-                                                    .data!.tracks[index].videoId);
+                                                    .data!
+                                                    .tracks[index]
+                                                    .videoId);
                                             Navigator.push(
                                                 context,
                                                 PageTransition(
@@ -164,9 +179,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                           },
                                         );
                                       }),
-                                      const SizedBox(
-                                        height: 85,
-                                      )
+                                  const SizedBox(
+                                    height: 85,
+                                  )
                                 ],
                               );
                             } else {
@@ -197,7 +212,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           alignment: Alignment.center,
                           margin: const EdgeInsets.symmetric(horizontal: 10.0),
                           decoration: BoxDecoration(
-                              color: const Color(0XFFC4FC4C),
+                              color: primaryThemeColor,
                               borderRadius: BorderRadius.circular(10.0)),
                           width: MediaQuery.of(context).size.width * 0.95,
                           child: GestureDetector(

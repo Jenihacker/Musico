@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:musico/colors/color.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -58,11 +59,11 @@ class AboutScreen extends StatelessWidget {
                 ),
                 title: Text(
                   'Github',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listTitleTextColor),
                 ),
                 subtitle: Text(
                   'view github profile',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listSubtitleTextColor),
                 ),
                 onTap: () async {
                   _launchUrl("https://github.com/Jenihacker");
@@ -72,15 +73,15 @@ class AboutScreen extends StatelessWidget {
                 leading: const FaIcon(
                   FontAwesomeIcons.linkedin,
                   color: Color(0XFF0a66c2),
-                  size: 35.0,
+                  size: 40.0,
                 ),
                 title: Text(
                   'LinkedIn',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listTitleTextColor),
                 ),
                 subtitle: Text(
                   'view linkedin profile',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listSubtitleTextColor),
                 ),
                 onTap: () async {
                   _launchUrl(
@@ -95,11 +96,11 @@ class AboutScreen extends StatelessWidget {
                 ),
                 title: Text(
                   'Twitter',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listTitleTextColor),
                 ),
                 subtitle: Text(
                   'view twitter profile',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listSubtitleTextColor),
                 ),
                 onTap: () async {
                   _launchUrl("https://twitter.com/jenisonmonteiro");
@@ -113,15 +114,18 @@ class AboutScreen extends StatelessWidget {
                 ),
                 title: Text(
                   'Instagram',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listTitleTextColor),
                 ),
                 subtitle: Text(
                   'view instagram profile',
-                  style: GoogleFonts.poppins(),
+                  style: GoogleFonts.poppins(color: listSubtitleTextColor),
                 ),
                 onTap: () async {
                   _launchUrl("https://www.instagram.com/jenison__05/");
-                })
+                }),
+            const SizedBox(
+              height: 80,
+            )
           ],
         ),
       ),
