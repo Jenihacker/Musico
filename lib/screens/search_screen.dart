@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -18,7 +19,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  dynamic message = "";
+  String message = "";
   String recognizedText = "";
   bool available = false;
   bool _isListening = false;
@@ -85,16 +86,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Container(
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
-              colors: [
-            Colors.black,
-            Colors.black
-            // Color(0XFF780206),
-            // Color(0XFF061161),
-          ])),
+      decoration: const BoxDecoration(color: Colors.black),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -130,104 +122,103 @@ class _SearchScreenState extends State<SearchScreen> {
                         focusNode: focusNode,
                         enableSuggestions: true,
                         decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color(0XFF1e1c22),
-                            hintText: 'Search',
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(left: 5.0),
-                              child: Icon(
-                                BootstrapIcons.search,
-                                color: Colors.white,
-                              ),
-                            ),
-                            hintStyle: GoogleFonts.poppins(
+                          filled: true,
+                          fillColor: const Color(0XFF1e1c22),
+                          hintText: 'Search',
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(left: 5.0),
+                            child: Icon(
+                              BootstrapIcons.search,
                               color: Colors.white,
-                              fontSize: 18.0,
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            suffixIcon: IconButton(
-                              padding: const EdgeInsets.only(right: 10.0),
-                              splashRadius: 10,
-                              color: iconColor,
-                              onPressed: () {
-                                setState(() {
-                                  _isListening = false;
-                                });
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return AlertDialog(
-                                        backgroundColor:
-                                            const Color(0XFF1e1c22),
-                                        actionsPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 40.0),
-                                        title: Text('Tap To Speak',
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 30.0,
-                                              fontWeight: FontWeight.bold,
-                                            )),
-                                        actionsAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        actions: [
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: Text(recognizedText,
-                                                textAlign: TextAlign.center,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                    fontSize: 30.0)),
-                                          ),
-                                          Center(
-                                              child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: AvatarGlow(
-                                              glowColor: primaryThemeColor,
-                                              animate: _isListening,
-                                              repeat: true,
-                                              child: InkWell(
-                                                overlayColor:
-                                                    const MaterialStatePropertyAll(
-                                                        Colors.transparent),
-                                                onTap: () async {
-                                                  setState((() {
-                                                    _isListening =
-                                                        !_isListening;
-                                                  }));
-                                                  if (_isListening) {
-                                                    listenSpeech(setState);
-                                                  } else {
-                                                    stopSpeech(setState);
-                                                  }
-                                                },
-                                                child: CircleAvatar(
-                                                  radius: 40.0,
-                                                  backgroundColor:
-                                                      primaryThemeColor,
-                                                  child: Icon(
-                                                    _isListening
-                                                        ? Icons.mic
-                                                        : Icons.mic_none,
-                                                    size: 40.0,
-                                                    color: Colors.black,
-                                                  ),
+                          ),
+                          hintStyle: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          suffixIcon: IconButton(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            splashRadius: 10,
+                            color: iconColor,
+                            onPressed: () {
+                              setState(() {
+                                _isListening = false;
+                              });
+                              showDialog(
+                                context: context,
+                                builder: (context) => StatefulBuilder(
+                                  builder: (context, setState) {
+                                    return AlertDialog(
+                                      backgroundColor: const Color(0XFF1e1c22),
+                                      actionsPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 40.0),
+                                      title: Text('Tap To Speak',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.bold,
+                                          )),
+                                      actionsAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      actions: [
+                                        SizedBox(
+                                          width: double.infinity,
+                                          child: Text(recognizedText,
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontSize: 30.0)),
+                                        ),
+                                        Center(
+                                            child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: AvatarGlow(
+                                            glowColor: primaryThemeColor,
+                                            animate: _isListening,
+                                            repeat: true,
+                                            child: InkWell(
+                                              overlayColor:
+                                                  const MaterialStatePropertyAll(
+                                                      Colors.transparent),
+                                              onTap: () async {
+                                                setState((() {
+                                                  _isListening = !_isListening;
+                                                }));
+                                                if (_isListening) {
+                                                  listenSpeech(setState);
+                                                } else {
+                                                  stopSpeech(setState);
+                                                }
+                                              },
+                                              child: CircleAvatar(
+                                                radius: 40.0,
+                                                backgroundColor:
+                                                    primaryThemeColor,
+                                                child: Icon(
+                                                  _isListening
+                                                      ? Icons.mic
+                                                      : Icons.mic_none,
+                                                  size: 40.0,
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             ),
-                                          ))
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.mic, size: 30.0),
-                            )),
+                                          ),
+                                        ))
+                                      ],
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.mic, size: 30.0),
+                          ),
+                        ),
                         controller: controller,
                         onSubmitted: (value) {
                           if (value.isNotEmpty) {

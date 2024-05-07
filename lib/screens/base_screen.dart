@@ -19,17 +19,18 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseScreenState extends State<BaseScreen> {
   var currentIndex = 0;
+  List<Widget> widgets = [const HomeScreen(),const SearchScreen(),const AboutScreen()];
 
-  Widget mainbody() {
+  Widget mainBody() {
     switch (currentIndex) {
       case 0:
-        return const HomeScreen();
+        return widgets[0];
       case 1:
-        return const SearchScreen();
+        return widgets[1];
       case 2:
-        return const AboutScreen();
+        return widgets[2];
       default:
-        return const HomeScreen();
+        return widgets[0];
     }
   }
 
@@ -39,11 +40,11 @@ class _BaseScreenState extends State<BaseScreen> {
       child: Scaffold(
           resizeToAvoidBottomInset: false,
           body: Stack(children: [
-            mainbody(),
+            mainBody(),
             Consumer<MusicPlayerProvider>(
                 builder: (_, musicPlayerProvider, child) {
               return Positioned(
-                  bottom: 65,
+                  bottom: 75,
                   child: Visibility(
                     visible: musicPlayerProvider.audio == null ||
                             musicPlayerProvider.songs == []
@@ -156,7 +157,7 @@ class _BaseScreenState extends State<BaseScreen> {
           backgroundColor: Colors.transparent,
           extendBody: true,
           bottomNavigationBar: Container(
-            margin: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 2.0),
+            margin: const EdgeInsets.only(left: 12.0, right: 12.0),
             color: Colors.transparent,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),

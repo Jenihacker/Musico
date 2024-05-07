@@ -6,6 +6,7 @@ import 'package:musico/screens/wrapper.dart';
 import 'package:musico/services/Providers/music_player_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:upgrader/upgrader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ Future<void> main() async {
 
 class MyApp extends StatefulWidget {
   final SharedPreferences prefs;
+
   const MyApp({super.key, required this.prefs});
 
   @override
@@ -46,14 +48,17 @@ class _MyAppState extends State<MyApp> {
           primaryColor: Colors.white,
           primarySwatch: Colors.deepPurple,
           textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
+                bodyColor: Colors.white,
+                displayColor: Colors.white,
               ),
         ),
-        home: widget.prefs.getString('username') == null &&
-                widget.prefs.getString('avatar') == null
-            ? const Wrapper()
-            : const BaseScreen(),
+        home: UpgradeAlert(
+          upgrader: Upgrader(),
+          child: widget.prefs.getString('username') == null &&
+                  widget.prefs.getString('avatar') == null
+              ? const Wrapper()
+              : const BaseScreen(),
+        ),
       ),
     );
   }
