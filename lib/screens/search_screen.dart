@@ -9,6 +9,7 @@ import 'package:musico/colors/color.dart';
 import 'package:musico/screens/search_results.dart';
 import 'package:musico/services/api/search_suggestions_api.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class SearchScreen extends StatefulWidget {
@@ -24,6 +25,43 @@ class _SearchScreenState extends State<SearchScreen> {
   bool available = false;
   bool _isListening = false;
   stt.SpeechToText speech = stt.SpeechToText();
+  late final SharedPreferences prefs;
+  late final SuggestionsController suggestionsController;
+  bool isHistory = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getsharedpref();
+    suggestionsController = SuggestionsController();
+  }
+
+  void getsharedpref() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<void> sethistory(String historyItem) async {
+    List<String> history = prefs.getStringList('history') ?? [];
+    if (!history.contains(historyItem)) {
+      history.add(historyItem);
+      await prefs.setStringList('history', history);
+    } else {
+      history.remove(historyItem);
+      history.add(historyItem);
+      await prefs.setStringList('history', history);
+    }
+  }
+
+  Future<List<String>> gethistory() async {
+    List<String> history = prefs.getStringList('history') ?? [];
+    return history.reversed.toList();
+  }
+
+  Future<void> deleteHistoryItem(String historyItem) async {
+    List<String> history = prefs.getStringList('history') ?? [];
+    history.remove(historyItem);
+    await prefs.setStringList('history', history);
+  }
 
   Future<void> listenSpeech(setState) async {
     if (!available) {
@@ -110,7 +148,6 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   SizedBox(
                       child: TypeAheadField(
-                    hideOnEmpty: true,
                     hideOnLoading: true,
                     controller: TextEditingController(text: message),
                     builder: (context, controller, focusNode) {
@@ -222,6 +259,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         controller: controller,
                         onSubmitted: (value) {
                           if (value.isNotEmpty) {
+                            sethistory(value.toString());
                             Navigator.push(
                                 context,
                                 PageTransition(
@@ -241,6 +279,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: child,
                       );
                     },
+                    suggestionsController: suggestionsController,
                     itemBuilder: (context, value) {
                       return Container(
                         decoration: BoxDecoration(
@@ -253,8 +292,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                   Color(0XFF1e1c22),
                                 ])),
                         child: ListTile(
-                          leading: const Icon(Icons.music_note_outlined,
-                              color: Colors.white),
+                          leading: isHistory
+                              ? const Icon(
+                                  Icons.history,
+                                  color: Colors.white,
+                                )
+                              : const Icon(Icons.music_note_outlined,
+                                  color: Colors.white),
                           title: Text(
                             value,
                             style: GoogleFonts.poppins(
@@ -262,6 +306,16 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           ),
                           tileColor: Colors.transparent,
+                          trailing: Visibility(
+                            visible: isHistory,
+                            child: IconButton(
+                                onPressed: () {
+                                  deleteHistoryItem(value);
+                                  suggestionsController.refresh();
+                                },
+                                icon: const Icon(BootstrapIcons.x,
+                                    color: Colors.white)),
+                          ),
                         ),
                       );
                     },
@@ -269,6 +323,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       setState(() {
                         message = value;
                       });
+                      sethistory(value.toString());
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
                           return SearchResultScreen(message: value.toString());
@@ -276,6 +331,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       ));
                     },
                     suggestionsCallback: (search) async {
+                      if (search.isEmpty) {
+                        isHistory = true;
+                        return gethistory();
+                      }
+                      isHistory = false;
                       return await SearchSuggestionApi()
                               .getSuggestion(search) ??
                           [];
