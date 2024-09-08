@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:bootstrap_icons/bootstrap_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -9,8 +8,8 @@ import 'package:musico/colors/color.dart';
 import 'package:musico/screens/search_results.dart';
 import 'package:musico/services/api/search_suggestions_api.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:hive/hive.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -25,42 +24,42 @@ class _SearchScreenState extends State<SearchScreen> {
   bool available = false;
   bool _isListening = false;
   stt.SpeechToText speech = stt.SpeechToText();
-  late final SharedPreferences prefs;
   late final SuggestionsController suggestionsController;
+  late final Box historyBox;
   bool isHistory = false;
 
   @override
   void initState() {
     super.initState();
-    getsharedpref();
+    initializeHive();
     suggestionsController = SuggestionsController();
   }
 
-  void getsharedpref() async {
-    prefs = await SharedPreferences.getInstance();
+  Future<void> initializeHive() async {
+    historyBox = await Hive.openBox('searchHistory'); 
   }
 
   Future<void> sethistory(String historyItem) async {
-    List<String> history = prefs.getStringList('history') ?? [];
+    List<String> history = historyBox.get('history') ?? [];
     if (!history.contains(historyItem)) {
       history.add(historyItem);
-      await prefs.setStringList('history', history);
+      await historyBox.put('history', history);
     } else {
       history.remove(historyItem);
       history.add(historyItem);
-      await prefs.setStringList('history', history);
+      await historyBox.put('history', history);
     }
   }
 
   Future<List<String>> gethistory() async {
-    List<String> history = prefs.getStringList('history') ?? [];
+    List<String> history = historyBox.get('history') ?? [];
     return history.reversed.toList();
   }
 
   Future<void> deleteHistoryItem(String historyItem) async {
-    List<String> history = prefs.getStringList('history') ?? [];
+    List<String> history = historyBox.get('history') ?? [];
     history.remove(historyItem);
-    await prefs.setStringList('history', history);
+    await historyBox.put('history', history);
   }
 
   Future<void> listenSpeech(setState) async {

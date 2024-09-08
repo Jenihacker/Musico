@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:musico/components/song_card.dart';
+import 'package:musico/widgets/song_card.dart';
 import 'package:musico/shimmers/playlistcat_shimmer.dart';
 import 'package:musico/models/playlist_category.dart';
 

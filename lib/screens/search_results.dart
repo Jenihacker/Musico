@@ -5,6 +5,7 @@ import 'package:musico/services/Providers/music_player_provider.dart';
 import 'package:musico/services/api/search_song_api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:musico/screens/player_screen.dart';
+import 'package:musico/widgets/floating_mediabar.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:musico/shimmers/searchresult_shimmer.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getSongs = SearchSongs().getSongs(widget.message);
     getVideos = SearchSongs().getVideos(widget.message);
@@ -210,130 +210,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     ),
                     Consumer<MusicPlayerProvider>(
                         builder: (_, musicPlayerProvider, child) {
-                      return Positioned(
-                          bottom: 15,
-                          child: Visibility(
-                            visible: musicPlayerProvider.audio == null
-                                ? false
-                                : true,
-                            child: Container(
-                              alignment: Alignment.center,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              decoration: BoxDecoration(
-                                  color: primaryThemeColor,
-                                  borderRadius: BorderRadius.circular(10.0)),
-                              width: MediaQuery.of(context).size.width * 0.95,
-                              child: GestureDetector(
-                                onVerticalDragEnd: (details) {
-                                  musicPlayerProvider.advancedPlayer.stop();
-                                  musicPlayerProvider.audio = null;
-                                  musicPlayerProvider.isNewSongSet = true;
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                        title: Text(
-                                          musicPlayerProvider.songs.isNotEmpty
-                                              ? musicPlayerProvider
-                                                  .songs[musicPlayerProvider
-                                                      .currentIndex]
-                                                  .title
-                                              : "",
-                                          maxLines: 1,
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        subtitle: Text(
-                                          musicPlayerProvider.songs.isNotEmpty
-                                              ? musicPlayerProvider
-                                                  .songs[musicPlayerProvider
-                                                      .currentIndex]
-                                                  .author
-                                              : "",
-                                          maxLines: 1,
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w500),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        leading: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                          child: Image(
-                                            image: NetworkImage(
-                                                musicPlayerProvider
-                                                        .songs.isNotEmpty
-                                                    ? musicPlayerProvider
-                                                        .songs[
-                                                            musicPlayerProvider
-                                                                .currentIndex]
-                                                        .thumbnail
-                                                    : ""),
-                                          ),
-                                        ),
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            IconButton(
-                                              iconSize: 35,
-                                              icon:
-                                                  musicPlayerProvider.isPlaying
-                                                      ? const Icon(
-                                                          Icons.pause,
-                                                          size: 35,
-                                                          color: Colors.black,
-                                                        )
-                                                      : const Icon(
-                                                          Icons.play_arrow,
-                                                          size: 35,
-                                                          color: Colors.black,
-                                                        ),
-                                              onPressed: () {
-                                                musicPlayerProvider
-                                                    .togglePlayback();
-                                              },
-                                            ),
-                                            Visibility(
-                                              visible: musicPlayerProvider
-                                                      .advancedPlayer.hasNext
-                                                  ? true
-                                                  : false,
-                                              child: IconButton(
-                                                iconSize: 35,
-                                                icon: const Icon(
-                                                  Icons.skip_next,
-                                                  color: Colors.black,
-                                                ),
-                                                onPressed: () {
-                                                  musicPlayerProvider
-                                                      .playNextSong();
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      PageTransition(
-                                          child: const PlayerScreen(),
-                                          type:
-                                              PageTransitionType.bottomToTop));
-                                },
-                              ),
-                            ),
-                          ));
+                      return const Positioned(
+                          bottom: 15, child: FloatingMediaBar());
                     })
                   ],
                 )),
