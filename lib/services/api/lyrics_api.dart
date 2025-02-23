@@ -9,10 +9,6 @@ class Lyrics {
   ApiClient client = ApiClient();
 
   Future<String> getLyrics(String vid) async {
-    // var response = await dio.post(
-    //     'https://music.youtube.com/youtubei/v1/next?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&videoId=$vid&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer(endpoint.browseEndpoint.browseId,title)',
-    //     data: _data);
-
     var response = await client.post(nextUrl,
         queryParamMap: {
           "key": "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
