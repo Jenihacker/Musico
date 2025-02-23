@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:musico/colors/color.dart';
 import 'package:musico/screens/base_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});
@@ -29,21 +29,22 @@ class _WrapperState extends State<Wrapper> {
   ];
   int currentAvatar = 0;
   String username = "";
-  late final SharedPreferences prefs;
+  late final Box avatarBox;
+
 
   @override
   void initState() {
     super.initState();
-    getsharedpref();
+    initializaHive();
   }
 
-  void getsharedpref() async {
-    prefs = await SharedPreferences.getInstance();
+  void initializaHive() async {
+    avatarBox = await Hive.openBox('avatarBox');
   }
 
-  void setsharedpref() async {
-    await prefs.setString('username', username);
-    await prefs.setString('avatar', avatars[currentAvatar]);
+  void setAvatar() async {
+    await avatarBox.put('username', username);
+    await avatarBox.put('avatar', avatars[currentAvatar]);
   }
 
   @override
@@ -167,7 +168,7 @@ class _WrapperState extends State<Wrapper> {
               ElevatedButton(
                   onPressed: () async {
                     if (username != "") {
-                      setsharedpref();
+                      setAvatar();
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

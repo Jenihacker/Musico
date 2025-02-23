@@ -1,11 +1,11 @@
 //import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:musico/colors/color.dart';
 import 'package:musico/components/playlist_container.dart';
 import 'package:musico/screens/wrapper.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,15 +16,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var settext = "";
-  late final SharedPreferences pref;
+  late final Box avatarBox;
   String username = "";
   String? avatar;
 
   void getsharedpref() async {
-    pref = await SharedPreferences.getInstance();
+    avatarBox = await Hive.openBox('avatarBox');
     setState(() {
-      username = pref.getString('username') ?? "";
-      avatar = pref.getString('avatar');
+      username = avatarBox.get('username') ?? "";
+      avatar = avatarBox.get('avatar');
     });
   }
 

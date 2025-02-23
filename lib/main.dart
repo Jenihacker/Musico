@@ -5,12 +5,13 @@ import 'package:musico/screens/base_screen.dart';
 import 'package:musico/screens/wrapper.dart';
 import 'package:musico/services/Providers/music_player_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences pref = await SharedPreferences.getInstance();
+  await Hive.initFlutter();
+  Box avatarBox = await Hive.openBox('avatarBox');
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
@@ -18,20 +19,25 @@ Future<void> main() async {
     androidStopForegroundOnPause: true,
   );
   runApp(MyApp(
-    prefs: pref,
+    avatarBox: avatarBox,
   ));
 }
 
 class MyApp extends StatefulWidget {
-  final SharedPreferences prefs;
+  final Box avatarBox;
 
-  const MyApp({super.key, required this.prefs});
+  const MyApp({super.key, required this.avatarBox});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -54,8 +60,8 @@ class _MyAppState extends State<MyApp> {
         ),
         home: UpgradeAlert(
           upgrader: Upgrader(),
-          child: widget.prefs.getString('username') == null &&
-                  widget.prefs.getString('avatar') == null
+          child: widget.avatarBox.get('username') == null &&
+                  widget.avatarBox.get('avatar') == null
               ? const Wrapper()
               : const BaseScreen(),
         ),
