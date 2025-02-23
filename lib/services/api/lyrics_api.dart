@@ -1,43 +1,44 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:musico/constants/api_url.dart';
+import 'package:musico/utils/client.dart';
 
 final dio = Dio();
 
 class Lyrics {
-  final String _data = jsonEncode({
-    "context": {
-      "client": {
-        "hl": "en",
-        "gl": "US",
-        "clientName": "ANDROID_MUSIC",
-        "clientVersion": "5.26.1",
-        "clientScreen": "WATCH",
-        "androidSdkVersion": 31
-      },
-      "thirdParty": {"embedUrl": "https://www.youtube.com/"}
-    },
-    "playbackContext": {
-      "contentPlaybackContext": {"signatureTimestamp": 19250}
-    },
-    "racyCheckOk": true,
-    "contentCheckOk": true
-  });
+  ApiClient client = ApiClient();
 
   Future<String> getLyrics(String vid) async {
-    var response = await dio.post(
-        'https://music.youtube.com/youtubei/v1/next?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&videoId=$vid&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer(endpoint.browseEndpoint.browseId,title)',
-        data: _data);
-    var data1 = jsonDecode(response.toString());
-    data1 = data1["contents"]["singleColumnMusicWatchNextResultsRenderer"]
+    // var response = await dio.post(
+    //     'https://music.youtube.com/youtubei/v1/next?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&videoId=$vid&fields=contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer(endpoint.browseEndpoint.browseId,title)',
+    //     data: _data);
+
+    var response = await client.post(nextUrl,
+        queryParamMap: {
+          "key": "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
+          "videoId": vid,
+          "fields":
+              "contents.singleColumnMusicWatchNextResultsRenderer.tabbedRenderer.watchNextTabbedResultsRenderer.tabs.tabRenderer(endpoint.browseEndpoint.browseId,title)"
+        },
+        ytClientName: "ANDROID_MUSIC");
+
+    var data = jsonDecode(response.body.toString());
+
+    data = data["contents"]["singleColumnMusicWatchNextResultsRenderer"]
             ["tabbedRenderer"]["watchNextTabbedResultsRenderer"]["tabs"][1]
         ["tabRenderer"]["endpoint"]["browseEndpoint"]["browseId"];
-    response = await dio.post(
-        'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&browseId=$data1&fields=contents',
-        data: _data);
-    data1 = jsonDecode(response.toString());
+
+    response = await client.post(browseUrl,
+        queryParamMap: {
+          "key": "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
+          "browseId": data,
+          "fields": "contents"
+        },
+        ytClientName: "ANDROID_MUSIC");
+    data = jsonDecode(response.body.toString());
     try {
-      String lyrics = data1["contents"].isNotEmpty
-          ? data1["contents"]["sectionListRenderer"]["contents"][0]
+      String lyrics = data["contents"].isNotEmpty
+          ? data["contents"]["sectionListRenderer"]["contents"][0]
                   ["musicDescriptionShelfRenderer"]["description"]["runs"][0]
               ["text"]
           : "Lyrics not available";
